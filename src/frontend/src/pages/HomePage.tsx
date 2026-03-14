@@ -44,8 +44,8 @@ export default function HomePage() {
       <header className="flex items-center justify-between px-6 py-4 md:px-10">
         <div className="flex items-center gap-3">
           <img
-            src="/assets/generated/dentaai-logo-transparent.dim_200x200.png"
-            alt="DentaAI Logo"
+            src="/assets/uploads/file_00000000a88c720bbdf9639edb08e122-1.png"
+            alt="DantaNova Logo"
             className="w-9 h-9 object-contain"
           />
           <span className="font-display font-bold text-xl tracking-tight">
@@ -76,12 +76,12 @@ export default function HomePage() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="flex flex-col items-center text-center max-w-2xl"
         >
-          {/* Animated tooth icon */}
-          <div className="relative mb-8">
+          {/* Animated logo icon */}
+          <div className="relative mb-6">
             <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center animate-pulse-glow">
               <img
-                src="/assets/generated/dentaai-logo-transparent.dim_200x200.png"
-                alt=""
+                src="/assets/uploads/file_00000000a88c720bbdf9639edb08e122-1.png"
+                alt="DantaNova Logo"
                 className="w-20 h-20 object-contain animate-float"
               />
             </div>
@@ -91,6 +91,17 @@ export default function HomePage() {
               style={{ animation: "spin 8s linear infinite" }}
             />
           </div>
+
+          {/* Tagline */}
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.6 }}
+            className="text-sm italic font-medium tracking-wide mb-8"
+            style={{ color: "oklch(0.78 0.12 85)" }}
+          >
+            Because Every Smile Matters The Most
+          </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

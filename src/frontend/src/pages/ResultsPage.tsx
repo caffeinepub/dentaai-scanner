@@ -123,8 +123,8 @@ export default function ResultsPage() {
       {/* Header */}
       <header className="flex items-center gap-3 px-4 py-4 border-b border-border/30">
         <img
-          src="/assets/generated/dentaai-logo-transparent.dim_200x200.png"
-          alt=""
+          src="/assets/uploads/file_00000000a88c720bbdf9639edb08e122-1.png"
+          alt="DantaNova Logo"
           className="w-8 h-8 object-contain"
         />
         <div className="flex-1">

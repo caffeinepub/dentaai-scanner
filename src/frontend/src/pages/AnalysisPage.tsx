@@ -91,8 +91,8 @@ export default function AnalysisPage() {
           />
           <div className="absolute inset-0 flex items-center justify-center">
             <img
-              src="/assets/generated/dentaai-logo-transparent.dim_200x200.png"
-              alt=""
+              src="/assets/uploads/file_00000000a88c720bbdf9639edb08e122-1.png"
+              alt="DantaNova Logo"
               className="w-16 h-16 object-contain opacity-80"
             />
           </div>

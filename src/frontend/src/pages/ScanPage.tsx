@@ -126,8 +126,8 @@ export default function ScanPage() {
           </p>
         </div>
         <img
-          src="/assets/generated/dentaai-logo-transparent.dim_200x200.png"
-          alt=""
+          src="/assets/uploads/file_00000000a88c720bbdf9639edb08e122-1.png"
+          alt="DantaNova Logo"
           className="w-8 h-8 object-contain"
         />
       </header>
