@@ -1,6 +1,7 @@
 import { useActor } from "@/hooks/useActor";
 import type { ScanResult } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 export function useScanHistory() {
   const { actor, isFetching } = useActor();
@@ -40,5 +41,37 @@ export function useSubmitScan() {
       qc.invalidateQueries({ queryKey: ["scanHistory"] });
       qc.invalidateQueries({ queryKey: ["latestScan"] });
     },
+  });
+}
+
+export function useVisitorCount() {
+  const { actor, isFetching } = useActor();
+
+  // Fire-and-forget: record this visit only if the function exists on the actor
+  useEffect(() => {
+    if (actor && typeof (actor as any).recordVisit === "function") {
+      try {
+        (actor as any).recordVisit().catch(() => {});
+      } catch {
+        // Silently ignore if recordVisit is unavailable
+      }
+    }
+  }, [actor]);
+
+  return useQuery({
+    queryKey: ["visitorCount"],
+    queryFn: async (): Promise<number> => {
+      if (!actor) return 0;
+      try {
+        if (typeof (actor as any).getVisitorCount === "function") {
+          const count = await (actor as any).getVisitorCount();
+          return Number(count);
+        }
+        return 0;
+      } catch {
+        return 0;
+      }
+    },
+    enabled: !!actor && !isFetching,
   });
 }

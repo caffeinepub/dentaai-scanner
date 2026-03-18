@@ -11,7 +11,6 @@ import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
 actor {
-  // Scan and Tooth Data Model
   type ToothStatus = {
     #healthy;
     #risk;
@@ -19,7 +18,7 @@ actor {
   };
 
   type ToothRecord = {
-    number : Nat; // Tooth 1-32
+    number : Nat;
     status : ToothStatus;
     condition : Text;
     recommendation : Text;
@@ -27,7 +26,7 @@ actor {
 
   type ScanResult = {
     timestamp : Time.Time;
-    overallScore : Nat; // 0-100
+    overallScore : Nat;
     teeth : [ToothRecord];
   };
 
@@ -37,9 +36,14 @@ actor {
     };
   };
 
-  // User Profile Model
   public type UserProfile = {
     name : Text;
+  };
+
+  public type FeedbackEntry = {
+    author : Principal;
+    text : Text;
+    timestamp : Time.Time;
   };
 
   let accessControlState = AccessControl.initState();
@@ -47,6 +51,10 @@ actor {
 
   let userScanResults = Map.empty<Principal, [ScanResult]>();
   let userProfiles = Map.empty<Principal, UserProfile>();
+  let feedbackList = Map.empty<Nat, FeedbackEntry>();
+  var feedbackCount : Nat = 0;
+  var visitorCount : Nat = 0;
+  let visitors = Map.empty<Principal, Bool>();
 
   func validateScan(scan : ScanResult) {
     if (scan.teeth.size() != 32) {
@@ -59,7 +67,52 @@ actor {
     };
   };
 
-  // User Profile Functions
+  // Visitor tracking
+  public shared ({ caller }) func recordVisit() : async () {
+    switch (visitors.get(caller)) {
+      case (null) {
+        visitors.add(caller, true);
+        visitorCount += 1;
+      };
+      case (?_) {};
+    };
+  };
+
+  public query func getVisitorCount() : async Nat {
+    visitorCount;
+  };
+
+  // Feedback
+  public shared ({ caller }) func submitFeedback(text : Text) : async () {
+    if (text.size() == 0) {
+      Runtime.trap("Feedback cannot be empty");
+    };
+    let entry : FeedbackEntry = {
+      author = caller;
+      text = text;
+      timestamp = Time.now();
+    };
+    feedbackList.add(feedbackCount, entry);
+    feedbackCount += 1;
+  };
+
+  public query ({ caller }) func getFeedbackList() : async [FeedbackEntry] {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can view feedback");
+    };
+    var result : [FeedbackEntry] = [];
+    var i : Nat = 0;
+    while (i < feedbackCount) {
+      switch (feedbackList.get(i)) {
+        case (?entry) { result := result.concat([entry]) };
+        case (null) {};
+      };
+      i += 1;
+    };
+    result;
+  };
+
+  // User Profile
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can access profiles");
@@ -81,7 +134,6 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Submit Scan (any user, including guests)
   public shared ({ caller }) func submitScan(scan : ScanResult) : async () {
     validateScan(scan);
     let existingScans = switch (userScanResults.get(caller)) {
@@ -92,7 +144,6 @@ actor {
     userScanResults.add(caller, updatedScans);
   };
 
-  // Get caller's scan history (logged-in users only)
   public query ({ caller }) func getCallerScanHistory() : async [ScanResult] {
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can access scan history");
@@ -103,7 +154,6 @@ actor {
     };
   };
 
-  // Get specific user's scan history (admin and owner only)
   public query ({ caller }) func getUserScanHistory(user : Principal) : async [ScanResult] {
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Unauthorized: Can only view your own scan history");
@@ -114,7 +164,6 @@ actor {
     };
   };
 
-  // Get latest scan for caller (users only)
   public query ({ caller }) func getCallerLatestScan() : async ?ScanResult {
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can access latest scan");
@@ -128,7 +177,6 @@ actor {
     };
   };
 
-  // Delete scan results (users only)
   public shared ({ caller }) func deleteUserScans() : async () {
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can delete scans");

@@ -1,8 +1,10 @@
+import FloatingFeedback from "@/components/FloatingFeedback";
 import { Toaster } from "@/components/ui/sonner";
 import { ScanProvider } from "@/context/ScanContext";
 import AnalysisPage from "@/pages/AnalysisPage";
 import HistoryPage from "@/pages/HistoryPage";
 import HomePage from "@/pages/HomePage";
+import QRCodePage from "@/pages/QRCodePage";
 import ResultsPage from "@/pages/ResultsPage";
 import ScanPage from "@/pages/ScanPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -54,12 +56,19 @@ const historyRoute = createRoute({
   component: HistoryPage,
 });
 
+const qrRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/qr",
+  component: QRCodePage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   scanRoute,
   analysisRoute,
   resultsRoute,
   historyRoute,
+  qrRoute,
 ]);
 
 const router = createRouter({ routeTree });
@@ -75,6 +84,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <ScanProvider>
         <RouterProvider router={router} />
+        <FloatingFeedback />
         <Toaster />
       </ScanProvider>
     </QueryClientProvider>

@@ -1,7 +1,10 @@
+import LogoCircle from "@/components/LogoCircle";
+import { Button } from "@/components/ui/button";
 import { useScanContext } from "@/context/ScanContext";
+import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { generateScanResult } from "@/utils/scanSimulation";
 import { useNavigate } from "@tanstack/react-router";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, LogIn, LogOut } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 
@@ -16,6 +19,7 @@ const STEPS = [
 export default function AnalysisPage() {
   const navigate = useNavigate();
   const { capturedImages, setScanResult } = useScanContext();
+  const { identity, login, clear } = useInternetIdentity();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
@@ -66,117 +70,152 @@ export default function AnalysisPage() {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center bg-background relative overflow-hidden"
+      className="min-h-screen flex flex-col bg-background relative overflow-hidden"
       data-ocid="analysis.loading_state"
     >
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 50% at 50% 50%, oklch(0.73 0.19 200 / 0.08) 0%, transparent 70%)",
-        }}
-      />
-      <div className="absolute inset-0 grid-bg opacity-40 pointer-events-none" />
+      {/* Header with sign in/out */}
+      <header className="flex items-center justify-between px-4 py-3 border-b border-border/20 relative z-20">
+        <LogoCircle size="sm" />
+        {identity ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => clear()}
+            data-ocid="analysis.secondary_button"
+            className="rounded-full px-3 border border-primary/30 text-primary hover:bg-primary/10"
+          >
+            <LogOut className="w-3.5 h-3.5 mr-1.5" />
+            Sign Out
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => login()}
+            data-ocid="analysis.primary_button"
+            className="rounded-full px-3 border border-primary/30 text-primary hover:bg-primary/10"
+          >
+            <LogIn className="w-3.5 h-3.5 mr-1.5" />
+            Sign In
+          </Button>
+        )}
+      </header>
+      <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 60% 50% at 50% 50%, oklch(0.78 0.16 80 / 0.07) 0%, transparent 70%)",
+          }}
+        />
+        <div className="absolute inset-0 grid-bg opacity-40 pointer-events-none" />
 
-      <div className="relative z-10 flex flex-col items-center gap-10 px-6 max-w-md w-full">
-        <div className="relative w-36 h-36">
-          <div className="absolute inset-0 rounded-full border-2 border-primary/20" />
-          <div
-            className="absolute inset-0 rounded-full border-2 border-transparent"
-            style={{
-              borderTopColor: "oklch(0.73 0.19 200)",
-              borderRightColor: "oklch(0.73 0.19 200 / 0.5)",
-              animation: "spin 1.2s linear infinite",
-            }}
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <img
-              src="/assets/uploads/file_00000000a88c720bbdf9639edb08e122-1.png"
-              alt="DantaNova Logo"
-              className="w-16 h-16 object-contain opacity-80"
-            />
-          </div>
-          <div className="absolute inset-4 overflow-hidden rounded-full">
+        <div className="relative z-10 flex flex-col items-center gap-10 px-6 max-w-md w-full">
+          {/* Circular spinner with logo inside */}
+          <div className="relative w-36 h-36 flex items-center justify-center">
+            <div className="absolute inset-[-16px] rounded-full border border-primary/10" />
+            <div className="absolute inset-[-6px] rounded-full border border-primary/15" />
             <div
-              className="absolute left-0 right-0 h-0.5 animate-scan-line"
+              className="absolute inset-0 rounded-full border-2 border-transparent"
               style={{
-                background:
-                  "linear-gradient(90deg, transparent, oklch(0.73 0.19 200 / 0.8), transparent)",
+                borderTopColor: "oklch(0.78 0.16 80)",
+                borderRightColor: "oklch(0.78 0.16 80 / 0.5)",
+                animation: "spin 1.2s linear infinite",
+              }}
+            />
+            <LogoCircle size="lg" animate />
+            <div className="absolute inset-4 overflow-hidden rounded-full">
+              <div
+                className="absolute left-0 right-0 h-0.5 animate-scan-line"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent, oklch(0.78 0.16 80 / 0.8), transparent)",
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="text-center">
+            <h1 className="font-display text-2xl font-bold mb-1">
+              AI Analysis
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Scanning {imageCount || 5} captured images
+            </p>
+          </div>
+
+          <div className="w-full flex flex-col gap-3">
+            {STEPS.map((step, i) => {
+              const isDone = completedSteps.includes(i);
+              const isStepActive = i === currentStep && !isDone;
+              const isPending = i > currentStep;
+
+              return (
+                <motion.div
+                  key={step.label}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: isPending ? 0.35 : 1, x: 0 }}
+                  transition={{ delay: i * 0.08, duration: 0.4 }}
+                  className="flex items-center gap-3 glass-card rounded-3xl px-4 py-3"
+                >
+                  <div
+                    className={`circle-icon w-8 h-8 flex-shrink-0 ${
+                      isDone
+                        ? "bg-primary/20 circle-glow-ring"
+                        : isStepActive
+                          ? "bg-primary/10 border border-primary/50"
+                          : "bg-muted/50"
+                    }`}
+                  >
+                    {isDone ? (
+                      <CheckCircle2 className="w-4 h-4 text-primary" />
+                    ) : isStepActive ? (
+                      <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/30" />
+                    )}
+                  </div>
+                  <span
+                    className={`text-sm font-medium flex-1 ${
+                      isDone
+                        ? "text-primary"
+                        : isStepActive
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                    }`}
+                  >
+                    {step.label}
+                  </span>
+                  <AnimatePresence>
+                    {isDone && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="text-xs text-primary font-semibold bg-primary/10 px-2.5 py-0.5 rounded-full"
+                      >
+                        Done
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full bg-primary"
+              style={{
+                width: `${progressPct}%`,
+                transition: "width 0.5s ease",
               }}
             />
           </div>
-        </div>
 
-        <div className="text-center">
-          <h1 className="font-display text-2xl font-bold mb-1">AI Analysis</h1>
-          <p className="text-muted-foreground text-sm">
-            Scanning {imageCount || 5} captured images
+          <p className="text-xs text-muted-foreground">
+            This usually takes a few seconds…
           </p>
         </div>
-
-        <div className="w-full flex flex-col gap-3">
-          {STEPS.map((step, i) => {
-            const isDone = completedSteps.includes(i);
-            const isStepActive = i === currentStep && !isDone;
-            const isPending = i > currentStep;
-
-            return (
-              <motion.div
-                key={step.label}
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: isPending ? 0.35 : 1, x: 0 }}
-                transition={{ delay: i * 0.08, duration: 0.4 }}
-                className="flex items-center gap-3 glass-card rounded-xl px-4 py-3"
-              >
-                <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
-                  {isDone ? (
-                    <CheckCircle2 className="w-5 h-5 text-primary" />
-                  ) : isStepActive ? (
-                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <div className="w-3 h-3 rounded-full bg-muted" />
-                  )}
-                </div>
-                <span
-                  className={`text-sm font-medium ${
-                    isDone
-                      ? "text-primary"
-                      : isStepActive
-                        ? "text-foreground"
-                        : "text-muted-foreground"
-                  }`}
-                >
-                  {step.label}
-                </span>
-                <AnimatePresence>
-                  {isDone && (
-                    <motion.span
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="ml-auto text-xs text-primary font-semibold"
-                    >
-                      Done
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full rounded-full bg-primary"
-            style={{
-              width: `${progressPct}%`,
-              transition: "width 0.5s ease",
-            }}
-          />
-        </div>
-
-        <p className="text-xs text-muted-foreground">
-          This usually takes a few seconds…
-        </p>
       </div>
     </div>
   );

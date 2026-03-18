@@ -1,3 +1,4 @@
+import LogoCircle from "@/components/LogoCircle";
 import { Button } from "@/components/ui/button";
 import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { useNavigate } from "@tanstack/react-router";
@@ -6,6 +7,9 @@ import {
   Brain,
   ChevronRight,
   History,
+  LogIn,
+  LogOut,
+  QrCode,
   ScanLine,
   Shield,
 } from "lucide-react";
@@ -34,37 +38,86 @@ const FEATURES = [
   },
 ];
 
+const stats = [
+  { value: "32", label: "Teeth Analyzed" },
+  { value: "6", label: "Conditions Detected" },
+  { value: "~30s", label: "Scan Time" },
+];
+
 export default function HomePage() {
   const navigate = useNavigate();
-  const { identity } = useInternetIdentity();
+  const { identity, login, clear } = useInternetIdentity();
+
+  const handleStartScan = () => {
+    if (identity) {
+      navigate({ to: "/scan" });
+    } else {
+      login();
+    }
+  };
 
   return (
     <div className="min-h-screen grid-bg flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 md:px-10">
-        <div className="flex items-center gap-3">
-          <img
-            src="/assets/uploads/file_00000000a88c720bbdf9639edb08e122-1.png"
-            alt="DantaNova Logo"
-            className="w-9 h-9 object-contain"
-          />
+      {/* Header — three-column layout so logo is perfectly centered */}
+      <header className="grid grid-cols-3 items-center px-6 py-4 md:px-10">
+        {/* Left spacer */}
+        <div className="flex justify-start">{/* intentional spacer */}</div>
+
+        {/* Center: logo + brand name */}
+        <div className="flex items-center justify-center gap-3">
+          <LogoCircle size="sm" />
           <span className="font-display font-bold text-xl tracking-tight">
-            Denta<span className="text-gradient-cyan">AI</span>
+            Danta<span className="text-gradient-cyan">Nova</span>
           </span>
         </div>
-        <nav className="flex items-center gap-3">
+
+        {/* Right: nav items */}
+        <nav className="flex items-center justify-end gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate({ to: "/qr" })}
+            data-ocid="home.link"
+            className="text-muted-foreground hover:text-foreground rounded-full px-4"
+          >
+            <QrCode className="w-4 h-4 mr-2" />
+            QR Code
+          </Button>
           {identity ? (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate({ to: "/history" })}
+                data-ocid="home.link"
+                className="text-muted-foreground hover:text-foreground rounded-full px-4"
+              >
+                <History className="w-4 h-4 mr-2" />
+                History
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => clear()}
+                data-ocid="home.secondary_button"
+                className="rounded-full px-4 border-primary/40 text-primary hover:bg-primary/10"
+              >
+                <LogOut className="w-4 h-4 mr-1.5" />
+                Sign Out
+              </Button>
+            </>
+          ) : (
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={() => navigate({ to: "/history" })}
-              data-ocid="home.link"
-              className="text-muted-foreground hover:text-foreground"
+              onClick={() => login()}
+              data-ocid="home.primary_button"
+              className="rounded-full px-4 border-primary/50 text-primary hover:bg-primary/10"
             >
-              <History className="w-4 h-4 mr-2" />
-              History
+              <LogIn className="w-4 h-4 mr-1.5" />
+              Sign In
             </Button>
-          ) : null}
+          )}
         </nav>
       </header>
 
@@ -76,16 +129,11 @@ export default function HomePage() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="flex flex-col items-center text-center max-w-2xl"
         >
-          {/* Animated logo icon */}
+          {/* Hero logo */}
           <div className="relative mb-6">
-            <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center animate-pulse-glow">
-              <img
-                src="/assets/uploads/file_00000000a88c720bbdf9639edb08e122-1.png"
-                alt="DantaNova Logo"
-                className="w-20 h-20 object-contain animate-float"
-              />
-            </div>
-            {/* Orbiting ring */}
+            <div className="absolute inset-[-20px] rounded-full border border-primary/10" />
+            <div className="absolute inset-[-10px] rounded-full border border-primary/15" />
+            <LogoCircle size="xl" animate />
             <div
               className="absolute inset-[-8px] rounded-full border border-primary/30"
               style={{ animation: "spin 8s linear infinite" }}
@@ -114,7 +162,9 @@ export default function HomePage() {
             <h1 className="font-display text-5xl md:text-7xl font-bold leading-[1.05] mb-4">
               Know Your Teeth
               <br />
-              <span className="text-gradient-cyan">Before It's Too Late</span>
+              <span className="text-gradient-cyan">
+                Before It&apos;s Too Late
+              </span>
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl max-w-xl mx-auto leading-relaxed">
               Scan your mouth with your phone camera. Our AI detects cavities,
@@ -131,19 +181,19 @@ export default function HomePage() {
           >
             <Button
               size="lg"
-              className="text-base px-8 py-6 font-semibold glow-primary rounded-xl"
-              onClick={() => navigate({ to: "/scan" })}
+              className="text-base px-8 py-6 font-semibold glow-primary rounded-full"
+              onClick={handleStartScan}
               data-ocid="home.primary_button"
             >
               <ScanLine className="w-5 h-5 mr-2" />
-              Start Dental Scan
+              {identity ? "Start Dental Scan" : "Sign In to Scan"}
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
             {identity ? (
               <Button
                 size="lg"
                 variant="outline"
-                className="text-base px-8 py-6 rounded-xl border-border/60"
+                className="text-base px-8 py-6 rounded-full border-border/60"
                 onClick={() => navigate({ to: "/history" })}
                 data-ocid="home.link"
               >
@@ -153,19 +203,32 @@ export default function HomePage() {
             ) : null}
           </motion.div>
 
+          {/* Sign in hint for unauthenticated users */}
+          {!identity && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.55, duration: 0.5 }}
+              className="mt-4"
+            >
+              <p className="text-xs text-muted-foreground">
+                Sign in required to start a scan and save your reports.
+              </p>
+            </motion.div>
+          )}
+
           {/* Stats */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.6 }}
-            className="flex gap-8 mt-12 text-center"
+            className="flex flex-wrap justify-center gap-4 mt-12 text-center"
           >
-            {[
-              { value: "32", label: "Teeth Analyzed" },
-              { value: "6", label: "Conditions Detected" },
-              { value: "~30s", label: "Scan Time" },
-            ].map((stat) => (
-              <div key={stat.label}>
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="glass-card rounded-3xl px-4 py-3 circle-glow-ring"
+              >
                 <p className="font-display text-2xl font-bold text-gradient-cyan">
                   {stat.value}
                 </p>
@@ -190,9 +253,9 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 + i * 0.1, duration: 0.5 }}
-              className="glass-card rounded-2xl p-5"
+              className="glass-card rounded-3xl p-5"
             >
-              <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center mb-3">
+              <div className="circle-icon w-11 h-11 bg-primary/15 mb-3 circle-glow-ring">
                 <f.icon className="w-5 h-5 text-primary" />
               </div>
               <h3 className="font-display font-semibold text-sm mb-2">
@@ -209,7 +272,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="py-6 text-center text-xs text-muted-foreground border-t border-border/30">
         <p>
-          © {new Date().getFullYear()} DentaAI. Built with love using{" "}
+          © {new Date().getFullYear()} DantaNova. Built with love using{" "}
           <a
             href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(typeof window !== "undefined" ? window.location.hostname : "")}`}
             target="_blank"

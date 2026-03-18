@@ -1,3 +1,4 @@
+import LogoCircle from "@/components/LogoCircle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,8 +12,8 @@ import {
   Calendar,
   ChevronRight,
   ClipboardList,
-  History,
   LogIn,
+  LogOut,
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -25,7 +26,7 @@ function ScoreChip({ score }: { score: number }) {
         : "text-red-400 border-red-500/40 bg-red-500/10";
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${color}`}
+      className={`inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold border ${color}`}
     >
       {score}
     </span>
@@ -61,12 +62,12 @@ function ScanCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, duration: 0.4 }}
-      className="w-full glass-card rounded-2xl p-4 text-left flex items-center gap-4 hover:border-primary/40 transition-colors"
+      className="w-full glass-card rounded-3xl p-4 text-left flex items-center gap-4 hover:border-primary/40 transition-colors"
       onClick={() => onView(scan)}
       data-ocid={`history.item.${markerIndex}`}
     >
-      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-        <ClipboardList className="w-6 h-6 text-primary" />
+      <div className="circle-icon w-12 h-12 bg-primary/10 circle-glow-ring flex-shrink-0">
+        <ClipboardList className="w-5 h-5 text-primary" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
@@ -74,7 +75,7 @@ function ScanCard({
           {cavityCount > 0 && (
             <Badge
               variant="outline"
-              className="text-xs text-red-400 border-red-500/40"
+              className="text-xs text-red-400 border-red-500/40 rounded-full"
             >
               {cavityCount} {cavityCount === 1 ? "cavity" : "cavities"}
             </Badge>
@@ -82,7 +83,7 @@ function ScanCard({
           {riskCount > 0 && (
             <Badge
               variant="outline"
-              className="text-xs text-yellow-400 border-yellow-500/40"
+              className="text-xs text-yellow-400 border-yellow-500/40 rounded-full"
             >
               {riskCount} at risk
             </Badge>
@@ -100,7 +101,7 @@ function ScanCard({
 
 export default function HistoryPage() {
   const navigate = useNavigate();
-  const { identity, login } = useInternetIdentity();
+  const { identity, login, clear } = useInternetIdentity();
   const { setScanResult } = useScanContext();
   const { data: history, isLoading } = useScanHistory();
 
@@ -117,6 +118,7 @@ export default function HistoryPage() {
           size="icon"
           onClick={() => navigate({ to: "/" })}
           aria-label="Go back"
+          className="rounded-full"
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
@@ -126,7 +128,30 @@ export default function HistoryPage() {
             Your past dental scans
           </p>
         </div>
-        <History className="w-5 h-5 text-muted-foreground" />
+        {identity ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => clear()}
+            data-ocid="history.secondary_button"
+            className="rounded-full px-3 border border-primary/30 text-primary hover:bg-primary/10"
+          >
+            <LogOut className="w-3.5 h-3.5 mr-1.5" />
+            Sign Out
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => login()}
+            data-ocid="history.secondary_button"
+            className="rounded-full px-3 border border-primary/30 text-primary hover:bg-primary/10"
+          >
+            <LogIn className="w-3.5 h-3.5 mr-1.5" />
+            Sign In
+          </Button>
+        )}
+        <LogoCircle size="sm" />
       </header>
 
       <main className="flex-1 px-4 py-6 max-w-2xl mx-auto w-full">
@@ -137,8 +162,8 @@ export default function HistoryPage() {
             className="flex flex-col items-center justify-center gap-5 py-20 text-center"
             data-ocid="history.empty_state"
           >
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <LogIn className="w-8 h-8 text-primary" />
+            <div className="circle-icon w-20 h-20 bg-primary/10 circle-glow-ring">
+              <LogIn className="w-9 h-9 text-primary" />
             </div>
             <div>
               <h2 className="font-display font-bold text-xl">Login Required</h2>
@@ -149,8 +174,9 @@ export default function HistoryPage() {
             </div>
             <Button
               size="lg"
-              className="rounded-xl px-8"
+              className="rounded-full px-8"
               onClick={() => login()}
+              data-ocid="history.primary_button"
             >
               <LogIn className="w-4 h-4 mr-2" />
               Sign In
@@ -164,12 +190,12 @@ export default function HistoryPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="glass-card rounded-2xl p-4 flex gap-4 items-center"
+                className="glass-card rounded-3xl p-4 flex gap-4 items-center"
               >
-                <Skeleton className="w-12 h-12 rounded-xl" />
+                <Skeleton className="w-12 h-12 rounded-full" />
                 <div className="flex-1 flex flex-col gap-2">
-                  <Skeleton className="h-4 w-32 rounded" />
-                  <Skeleton className="h-3 w-24 rounded" />
+                  <Skeleton className="h-4 w-32 rounded-full" />
+                  <Skeleton className="h-3 w-24 rounded-full" />
                 </div>
               </div>
             ))}
@@ -181,8 +207,8 @@ export default function HistoryPage() {
             className="flex flex-col items-center justify-center gap-5 py-20 text-center"
             data-ocid="history.empty_state"
           >
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-              <ClipboardList className="w-8 h-8 text-muted-foreground" />
+            <div className="circle-icon w-20 h-20 bg-muted/50">
+              <ClipboardList className="w-9 h-9 text-muted-foreground" />
             </div>
             <div>
               <h2 className="font-display font-bold text-xl">No Scans Yet</h2>
@@ -193,15 +219,16 @@ export default function HistoryPage() {
             </div>
             <Button
               size="lg"
-              className="rounded-xl px-8 glow-primary"
+              className="rounded-full px-8 glow-primary"
               onClick={() => navigate({ to: "/scan" })}
+              data-ocid="history.primary_button"
             >
               Start First Scan
             </Button>
           </motion.div>
         ) : (
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-muted-foreground mb-1">
+            <p className="text-sm text-muted-foreground mb-1 px-1">
               {history.length} scan{history.length !== 1 ? "s" : ""} recorded
             </p>
             {history.map((scan, i) => (
