@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useActor } from "@/hooks/useActor";
-import { Loader2, MessageSquare } from "lucide-react";
+import { useInternetIdentity } from "@/hooks/useInternetIdentity";
+import { Loader2, LogIn, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -19,6 +20,7 @@ export default function FloatingFeedback() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const { actor } = useActor();
+  const { identity, login } = useInternetIdentity();
 
   async function handleSubmit() {
     if (!text.trim()) return;
@@ -65,33 +67,57 @@ export default function FloatingFeedback() {
             Help us improve DantaNova — tell us what you think!
           </DialogDescription>
         </DialogHeader>
-        <Textarea
-          data-ocid="feedback.textarea"
-          placeholder="Your thoughts, suggestions, or issues..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={4}
-          className="rounded-2xl resize-none border-border/60 focus:border-primary/60 bg-card/60"
-        />
-        <DialogFooter className="gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => setOpen(false)}
-            data-ocid="feedback.cancel_button"
-            className="rounded-full px-6"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={loading || !text.trim()}
-            data-ocid="feedback.submit_button"
-            className="rounded-full px-6 glow-primary"
-          >
-            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-            {loading ? "Sending..." : "Send Feedback"}
-          </Button>
-        </DialogFooter>
+
+        {!identity ? (
+          <div className="flex flex-col items-center gap-4 py-4">
+            <p className="text-sm text-muted-foreground text-center">
+              You need to sign in before submitting feedback.
+            </p>
+            <Button
+              onClick={() => {
+                setOpen(false);
+                login();
+              }}
+              data-ocid="feedback.signin_button"
+              className="rounded-full px-6 glow-primary"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              Sign In
+            </Button>
+          </div>
+        ) : (
+          <>
+            <Textarea
+              data-ocid="feedback.textarea"
+              placeholder="Your thoughts, suggestions, or issues..."
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={4}
+              className="rounded-2xl resize-none border-border/60 focus:border-primary/60 bg-card/60"
+            />
+            <DialogFooter className="gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setOpen(false)}
+                data-ocid="feedback.cancel_button"
+                className="rounded-full px-6"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={loading || !text.trim()}
+                data-ocid="feedback.submit_button"
+                className="rounded-full px-6 glow-primary"
+              >
+                {loading ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : null}
+                {loading ? "Sending..." : "Send Feedback"}
+              </Button>
+            </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

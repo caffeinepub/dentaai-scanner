@@ -9,6 +9,16 @@ const CONDITION_MAP: Record<
       condition: "Healthy",
       recommendation: "Excellent! Keep brushing twice daily and flossing.",
     },
+    {
+      condition: "Optimal Enamel",
+      recommendation:
+        "Tooth enamel is in excellent condition. Maintain routine dental hygiene.",
+    },
+    {
+      condition: "No Detectable Issues",
+      recommendation:
+        "No signs of disease. Continue with regular 6-month check-ups.",
+    },
   ],
   risk: [
     {
@@ -36,6 +46,41 @@ const CONDITION_MAP: Record<
       recommendation:
         "Use a soft-bristle toothbrush. Schedule a periodontal screening.",
     },
+    {
+      condition: "Dental Hypersensitivity",
+      recommendation:
+        "Use desensitizing toothpaste. Avoid very hot or cold foods. Consult dentist.",
+    },
+    {
+      condition: "Calculus (Tartar) Deposit",
+      recommendation:
+        "Professional scaling required. Improve daily flossing and brushing habits.",
+    },
+    {
+      condition: "Bruxism Signs",
+      recommendation:
+        "Signs of teeth grinding detected. Ask your dentist about a night guard.",
+    },
+    {
+      condition: "Periodontal Pocket Risk",
+      recommendation:
+        "Early periodontal pocketing suspected. Deep cleaning and monitoring advised.",
+    },
+    {
+      condition: "Interproximal Staining",
+      recommendation:
+        "Staining between teeth detected. Improve interdental brushing or flossing.",
+    },
+    {
+      condition: "Mild Tooth Discoloration",
+      recommendation:
+        "Surface stains detected. Consider professional whitening and avoid staining foods.",
+    },
+    {
+      condition: "Dry Socket Risk",
+      recommendation:
+        "Reduced saliva flow signs. Stay hydrated and consult a dentist if discomfort persists.",
+    },
   ],
   cavity: [
     {
@@ -52,6 +97,36 @@ const CONDITION_MAP: Record<
       condition: "Root Canal Risk",
       recommendation:
         "Immediate dental consultation required. May need endodontic treatment.",
+    },
+    {
+      condition: "Interproximal Cavity",
+      recommendation:
+        "Cavity between teeth detected. Prompt dental visit required before spreading.",
+    },
+    {
+      condition: "Secondary Caries",
+      recommendation:
+        "Decay around an existing filling detected. Replacement filling needed urgently.",
+    },
+    {
+      condition: "Cervical Caries",
+      recommendation:
+        "Decay at the gum line detected. Dental treatment required to prevent bone loss.",
+    },
+    {
+      condition: "Pulpitis (Pulp Inflammation)",
+      recommendation:
+        "Tooth pulp may be inflamed. Seek immediate dental care to avoid abscess.",
+    },
+    {
+      condition: "Periapical Abscess Risk",
+      recommendation:
+        "Signs of infection at root tip. Urgent dental assessment and possible antibiotics needed.",
+    },
+    {
+      condition: "Tooth Fracture with Decay",
+      recommendation:
+        "Cracked tooth with decay detected. Immediate dental evaluation for possible crown or extraction.",
     },
   ],
 };
