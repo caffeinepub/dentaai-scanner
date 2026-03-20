@@ -2,6 +2,7 @@ import LogoCircle from "@/components/LogoCircle";
 import { Button } from "@/components/ui/button";
 import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   Activity,
   Brain,
@@ -12,6 +13,7 @@ import {
   QrCode,
   ScanLine,
   Shield,
+  User,
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -94,6 +96,16 @@ export default function HomePage() {
               >
                 <History className="w-4 h-4 mr-2" />
                 History
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate({ to: "/profile" })}
+                data-ocid="home.profile_button"
+                className="text-muted-foreground hover:text-foreground rounded-full px-4"
+              >
+                <User className="w-4 h-4 mr-2" />
+                Profile
               </Button>
               <Button
                 variant="outline"
@@ -281,6 +293,10 @@ export default function HomePage() {
           >
             caffeine.ai
           </a>
+          {" | "}
+          <Link to="/privacy" className="text-primary hover:underline">
+            Privacy Policy
+          </Link>
         </p>
       </footer>
     </div>

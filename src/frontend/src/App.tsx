@@ -1,9 +1,12 @@
+import ConsentModal from "@/components/ConsentModal";
 import FloatingFeedback from "@/components/FloatingFeedback";
 import { Toaster } from "@/components/ui/sonner";
 import { ScanProvider } from "@/context/ScanContext";
 import AnalysisPage from "@/pages/AnalysisPage";
 import HistoryPage from "@/pages/HistoryPage";
 import HomePage from "@/pages/HomePage";
+import PrivacyPage from "@/pages/PrivacyPage";
+import ProfilePage from "@/pages/ProfilePage";
 import QRCodePage from "@/pages/QRCodePage";
 import ResultsPage from "@/pages/ResultsPage";
 import ScanPage from "@/pages/ScanPage";
@@ -62,6 +65,18 @@ const qrRoute = createRoute({
   component: QRCodePage,
 });
 
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/privacy",
+  component: PrivacyPage,
+});
+
+const profileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile",
+  component: ProfilePage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   scanRoute,
@@ -69,6 +84,8 @@ const routeTree = rootRoute.addChildren([
   resultsRoute,
   historyRoute,
   qrRoute,
+  privacyRoute,
+  profileRoute,
 ]);
 
 const router = createRouter({ routeTree });
@@ -86,6 +103,7 @@ export default function App() {
         <RouterProvider router={router} />
         <FloatingFeedback />
         <Toaster />
+        <ConsentModal />
       </ScanProvider>
     </QueryClientProvider>
   );
