@@ -120,8 +120,20 @@ export default function ConsentModal() {
         </div>
 
         <Button
-          className="w-full rounded-full font-semibold"
-          style={agreed ? { background: "#c9a84c", color: "#000" } : {}}
+          className="w-full rounded-full font-semibold text-sm tracking-wide"
+          style={{
+            background: agreed
+              ? "linear-gradient(135deg, #f5c518 0%, #d4a017 50%, #b8860b 100%)"
+              : "linear-gradient(135deg, #f5c51866 0%, #d4a01766 50%, #b8860b66 100%)",
+            color: "#1a0f00",
+            fontWeight: 700,
+            boxShadow: agreed
+              ? "0 0 18px #f5c51866, 0 2px 8px #b8860b55"
+              : "none",
+            border: "1.5px solid #f5c518",
+            opacity: agreed ? 1 : 0.6,
+            transition: "all 0.2s ease",
+          }}
           disabled={!agreed}
           onClick={handleAccept}
           data-ocid="consent.confirm_button"

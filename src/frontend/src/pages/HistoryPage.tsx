@@ -6,7 +6,7 @@ import { useScanContext } from "@/context/ScanContext";
 import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { useScanHistory } from "@/hooks/useQueries";
 import type { ScanResult } from "@/types";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Calendar,
@@ -255,11 +255,8 @@ export default function HistoryPage() {
           >
             caffeine.ai
           </a>
-          {" | "}
-          <Link to="/privacy" className="text-primary hover:underline">
-            Privacy Policy
-          </Link>
         </p>
+        <p className="mt-1">Developed by Swanandi Manoj Vispute</p>
       </footer>
     </div>
   );

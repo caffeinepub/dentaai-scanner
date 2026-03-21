@@ -2,7 +2,6 @@ import LogoCircle from "@/components/LogoCircle";
 import { Button } from "@/components/ui/button";
 import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { useNavigate } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
 import {
   Activity,
   Brain,
@@ -293,11 +292,8 @@ export default function HomePage() {
           >
             caffeine.ai
           </a>
-          {" | "}
-          <Link to="/privacy" className="text-primary hover:underline">
-            Privacy Policy
-          </Link>
         </p>
+        <p className="mt-1">Developed by Swanandi Manoj Vispute</p>
       </footer>
     </div>
   );

@@ -7,7 +7,7 @@ import { useScanContext } from "@/context/ScanContext";
 import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { useSubmitScan } from "@/hooks/useQueries";
 import type { ToothRecord } from "@/types";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -397,11 +397,8 @@ export default function ResultsPage() {
           >
             caffeine.ai
           </a>
-          {" | "}
-          <Link to="/privacy" className="text-primary hover:underline">
-            Privacy Policy
-          </Link>
         </p>
+        <p className="mt-1">Developed by Swanandi Manoj Vispute</p>
       </footer>
     </div>
   );
