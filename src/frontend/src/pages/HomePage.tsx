@@ -1,7 +1,7 @@
 import LogoCircle from "@/components/LogoCircle";
 import { Button } from "@/components/ui/button";
 import { useInternetIdentity } from "@/hooks/useInternetIdentity";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Activity,
   Brain,
@@ -279,19 +279,17 @@ export default function HomePage() {
           ))}
         </motion.div>
       </main>
-
       {/* Footer */}
       <footer className="py-6 text-center text-xs text-muted-foreground border-t border-border/30">
         <p>
-          © {new Date().getFullYear()} DantaNova. Built with love using{" "}
-          <a
-            href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(typeof window !== "undefined" ? window.location.hostname : "")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            caffeine.ai
-          </a>
+          © {new Date().getFullYear()} DantaNova ·{" "}
+          <Link to="/privacy" className="text-primary hover:underline">
+            Privacy Policy
+          </Link>
+          {" · "}
+          <Link to="/terms" className="text-primary hover:underline">
+            Terms of Service
+          </Link>
         </p>
         <p className="mt-1">Developed by Swanandi Manoj Vispute</p>
       </footer>

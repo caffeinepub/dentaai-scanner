@@ -1,13 +1,16 @@
+import CookieNotice from "@/components/CookieNotice";
 import FloatingFeedback from "@/components/FloatingFeedback";
 import { Toaster } from "@/components/ui/sonner";
 import { ScanProvider } from "@/context/ScanContext";
 import AnalysisPage from "@/pages/AnalysisPage";
 import HistoryPage from "@/pages/HistoryPage";
 import HomePage from "@/pages/HomePage";
+import PrivacyPage from "@/pages/PrivacyPage";
 import ProfilePage from "@/pages/ProfilePage";
 import QRCodePage from "@/pages/QRCodePage";
 import ResultsPage from "@/pages/ResultsPage";
 import ScanPage from "@/pages/ScanPage";
+import TermsPage from "@/pages/TermsPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   RouterProvider,
@@ -69,6 +72,18 @@ const profileRoute = createRoute({
   component: ProfilePage,
 });
 
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/privacy",
+  component: PrivacyPage,
+});
+
+const termsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/terms",
+  component: TermsPage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   scanRoute,
@@ -77,6 +92,8 @@ const routeTree = rootRoute.addChildren([
   historyRoute,
   qrRoute,
   profileRoute,
+  privacyRoute,
+  termsRoute,
 ]);
 
 const router = createRouter({ routeTree });
@@ -93,6 +110,7 @@ export default function App() {
       <ScanProvider>
         <RouterProvider router={router} />
         <FloatingFeedback />
+        <CookieNotice />
         <Toaster />
       </ScanProvider>
     </QueryClientProvider>

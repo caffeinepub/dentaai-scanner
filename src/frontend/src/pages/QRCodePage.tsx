@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useInternetIdentity } from "@/hooks/useInternetIdentity";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Download, LogIn, LogOut, Share2 } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -213,9 +213,18 @@ export default function QRCodePage() {
           </div>
         </motion.div>
       </main>
-
+      {/* Footer */}
       <footer className="py-6 text-center text-xs text-muted-foreground border-t border-border/30">
-        <p>© 2026 DantaNova. Because Every Smile Matters The Most.</p>
+        <p>
+          © {new Date().getFullYear()} DantaNova ·{" "}
+          <Link to="/privacy" className="text-primary hover:underline">
+            Privacy Policy
+          </Link>
+          {" · "}
+          <Link to="/terms" className="text-primary hover:underline">
+            Terms of Service
+          </Link>
+        </p>
         <p className="mt-1">Developed by Swanandi Manoj Vispute</p>
       </footer>
     </div>
