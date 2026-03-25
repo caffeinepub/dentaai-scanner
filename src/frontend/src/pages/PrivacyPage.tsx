@@ -137,14 +137,7 @@ export default function PrivacyPage() {
           party.
         </Section>
 
-        <Section title="8. Medical Disclaimer">
-          DantaNova is <strong>not a medical device</strong> and does not
-          provide medical diagnoses. Results are simulated and for informational
-          purposes only. Always consult a qualified dental professional for
-          diagnosis and treatment.
-        </Section>
-
-        <Section title="9. Contact">
+        <Section title="8. Contact">
           For privacy-related questions or data requests:
           <br />📧{" "}
           <a

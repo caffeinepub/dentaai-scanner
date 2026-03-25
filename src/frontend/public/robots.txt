@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dentaai-scanner-n0h.caffeine.xyz/sitemap.xml
