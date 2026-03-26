@@ -1,28 +1,34 @@
-# DantaNova - Privacy & Legal Pages
+# DantaNova — Real Dentist-Patient Connection
 
 ## Current State
-DantaNova is a live dental AI scanning app with sign-in, scan history, feedback, and QR code features. A PrivacyPage.tsx exists but immediately redirects to home (was removed per earlier user request). No Terms of Service page exists. No cookie notice exists. Footer has no legal links.
+The app has a `/find-dentist` page with 6 hardcoded sample dentist profiles. The "Request Appointment" button shows a toast but does nothing real. No dentist registration, no real booking, no messaging, no payment.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Privacy Policy page (`/privacy`) -- full written policy covering data collection, storage, GDPR rights (right to access, deletion, portability), data retention, contact info. Linked from footer.
-- Terms of Service page (`/terms`) -- full written ToS covering use of app, disclaimer that results are not medical advice, user responsibilities, intellectual property. Linked from footer.
-- Cookie Notice banner -- small bottom banner shown once per session. DantaNova uses localStorage (for consent/session state) but no tracking cookies. Banner informs user of this and has a dismiss button. Stored in localStorage so it doesn't reappear.
-- Footer links -- add "Privacy Policy" and "Terms of Service" links in all page footers.
+- **Dentist Registration** — dentists sign up with name, specialty, license number, location, languages, bio; stored on backend
+- **Dentist Availability** — dentists set available date/time slots from their dashboard
+- **Booking System** — patient selects a time slot from a dentist's real availability, creates a booking request; dentist can confirm or decline from their dashboard
+- **In-App Messaging** — per-booking chat between patient and dentist; both sides can send/read messages
+- **Simulated Payment** — patient marks payment as "paid" when booking is confirmed; dentist sees payment status as "received" after visit is marked complete
+- **Dentist Dashboard** — manage profile, availability slots, incoming booking requests, and messages
+- **Patient Bookings Page** — patients see all their bookings with status, can message dentist, mark visit complete
+- **In-app notification badges** — unread message count shown on navigation
 
 ### Modify
-- `App.tsx` -- add routes for `/privacy` and `/terms`
-- `PrivacyPage.tsx` -- replace redirect-to-home stub with full Privacy Policy content
-- All page footers -- add legal links
+- **FindDentistPage** — fetch dentists from backend instead of hardcoded data; "Book" button navigates to real booking flow
+- **App.tsx** — add new routes: /dentist-register, /dentist-dashboard, /book, /my-bookings, /messages/:bookingId
 
 ### Remove
-- Nothing removed
+- Hardcoded DENTISTS array from FindDentistPage
 
 ## Implementation Plan
-1. Write full PrivacyPage.tsx with GDPR-compliant Privacy Policy content
-2. Create TermsPage.tsx with Terms of Service content
-3. Create CookieNotice.tsx component -- bottom banner, dismissable, uses localStorage
-4. Add `/terms` route in App.tsx
-5. Mount CookieNotice in App.tsx
-6. Update footer in HomePage.tsx and all other pages to include Privacy Policy and Terms of Service links
+1. Backend: Add DentistProfile, AvailabilitySlot, Booking, Message types and all CRUD methods
+2. Regenerate backend bindings
+3. Frontend: DentistRegisterPage — form to sign up as a dentist
+4. Frontend: DentistDashboardPage — manage availability, view/confirm bookings, chat
+5. Frontend: BookingPage — patient picks a slot and submits booking request
+6. Frontend: MyBookingsPage — patient's booking history with status and messaging
+7. Frontend: MessagingPage — in-app chat per booking
+8. Update FindDentistPage to use real backend data
+9. Add routes in App.tsx

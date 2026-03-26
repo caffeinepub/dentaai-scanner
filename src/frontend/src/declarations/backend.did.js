@@ -13,6 +13,23 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const DentistProfile = IDL.Record({
+  'bio' : IDL.Text,
+  'name' : IDL.Text,
+  'languages' : IDL.Vec(IDL.Text),
+  'specialty' : IDL.Text,
+  'isVerified' : IDL.Bool,
+  'licenseNumber' : IDL.Text,
+  'location' : IDL.Text,
+});
+export const Time = IDL.Int;
+export const Message = IDL.Record({
+  'bookingId' : IDL.Nat,
+  'messageId' : IDL.Nat,
+  'text' : IDL.Text,
+  'sender' : IDL.Principal,
+  'timestamp' : Time,
+});
 export const ToothStatus = IDL.Variant({
   'risk' : IDL.Null,
   'healthy' : IDL.Null,
@@ -24,22 +41,78 @@ export const ToothRecord = IDL.Record({
   'recommendation' : IDL.Text,
   'condition' : IDL.Text,
 });
-export const Time = IDL.Int;
 export const ScanResult = IDL.Record({
   'teeth' : IDL.Vec(ToothRecord),
   'overallScore' : IDL.Nat,
   'timestamp' : Time,
 });
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
+export const BookingStatus = IDL.Variant({
+  'pending' : IDL.Null,
+  'completed' : IDL.Null,
+  'confirmed' : IDL.Null,
+  'declined' : IDL.Null,
+});
+export const PaymentStatus = IDL.Variant({
+  'paid' : IDL.Null,
+  'unpaid' : IDL.Null,
+  'released' : IDL.Null,
+});
+export const Booking = IDL.Record({
+  'status' : BookingStatus,
+  'paymentStatus' : PaymentStatus,
+  'bookingId' : IDL.Nat,
+  'patientId' : IDL.Principal,
+  'createdAt' : Time,
+  'slotId' : IDL.Nat,
+  'dentistId' : IDL.Principal,
+});
+export const AvailabilitySlot = IDL.Record({
+  'dateTimeLabel' : IDL.Text,
+  'slotId' : IDL.Nat,
+  'isBooked' : IDL.Bool,
+  'dentistId' : IDL.Principal,
+});
+export const FeedbackEntry = IDL.Record({
+  'text' : IDL.Text,
+  'author' : IDL.Principal,
+  'timestamp' : Time,
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'addAvailabilitySlot' : IDL.Func([IDL.Text], [IDL.Nat], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'bookSlot' : IDL.Func([IDL.Principal, IDL.Nat], [IDL.Nat], []),
+  'completeBooking' : IDL.Func([IDL.Nat], [], []),
+  'confirmBooking' : IDL.Func([IDL.Nat], [], []),
+  'declineBooking' : IDL.Func([IDL.Nat], [], []),
   'deleteUserScans' : IDL.Func([], [], []),
+  'getAllDentists' : IDL.Func([], [IDL.Vec(DentistProfile)], ['query']),
+  'getBookingMessages' : IDL.Func([IDL.Nat], [IDL.Vec(Message)], ['query']),
   'getCallerLatestScan' : IDL.Func([], [IDL.Opt(ScanResult)], ['query']),
   'getCallerScanHistory' : IDL.Func([], [IDL.Vec(ScanResult)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getDentistBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
+  'getDentistLanguages' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(IDL.Vec(IDL.Text))],
+      ['query'],
+    ),
+  'getDentistProfile' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(DentistProfile)],
+      ['query'],
+    ),
+  'getDentistSlots' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Vec(AvailabilitySlot)],
+      ['query'],
+    ),
+  'getFeedbackList' : IDL.Func([], [IDL.Vec(FeedbackEntry)], ['query']),
+  'getPatientBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
+  'getUnreadMessageCount' : IDL.Func([], [IDL.Nat], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -50,9 +123,18 @@ export const idlService = IDL.Service({
       [IDL.Vec(ScanResult)],
       ['query'],
     ),
+  'getVisitorCount' : IDL.Func([], [IDL.Nat], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'markPaymentPaid' : IDL.Func([IDL.Nat], [], []),
+  'markPaymentReleased' : IDL.Func([IDL.Nat], [], []),
+  'recordVisit' : IDL.Func([], [], []),
+  'registerDentistProfile' : IDL.Func([DentistProfile], [], []),
+  'removeAvailabilitySlot' : IDL.Func([IDL.Nat], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'sendMessage' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Nat], []),
+  'submitFeedback' : IDL.Func([IDL.Text], [], []),
   'submitScan' : IDL.Func([ScanResult], [], []),
+  'updateDentistProfile' : IDL.Func([DentistProfile], [], []),
 });
 
 export const idlInitArgs = [];
@@ -62,6 +144,23 @@ export const idlFactory = ({ IDL }) => {
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
+  });
+  const DentistProfile = IDL.Record({
+    'bio' : IDL.Text,
+    'name' : IDL.Text,
+    'languages' : IDL.Vec(IDL.Text),
+    'specialty' : IDL.Text,
+    'isVerified' : IDL.Bool,
+    'licenseNumber' : IDL.Text,
+    'location' : IDL.Text,
+  });
+  const Time = IDL.Int;
+  const Message = IDL.Record({
+    'bookingId' : IDL.Nat,
+    'messageId' : IDL.Nat,
+    'text' : IDL.Text,
+    'sender' : IDL.Principal,
+    'timestamp' : Time,
   });
   const ToothStatus = IDL.Variant({
     'risk' : IDL.Null,
@@ -74,22 +173,78 @@ export const idlFactory = ({ IDL }) => {
     'recommendation' : IDL.Text,
     'condition' : IDL.Text,
   });
-  const Time = IDL.Int;
   const ScanResult = IDL.Record({
     'teeth' : IDL.Vec(ToothRecord),
     'overallScore' : IDL.Nat,
     'timestamp' : Time,
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
+  const BookingStatus = IDL.Variant({
+    'pending' : IDL.Null,
+    'completed' : IDL.Null,
+    'confirmed' : IDL.Null,
+    'declined' : IDL.Null,
+  });
+  const PaymentStatus = IDL.Variant({
+    'paid' : IDL.Null,
+    'unpaid' : IDL.Null,
+    'released' : IDL.Null,
+  });
+  const Booking = IDL.Record({
+    'status' : BookingStatus,
+    'paymentStatus' : PaymentStatus,
+    'bookingId' : IDL.Nat,
+    'patientId' : IDL.Principal,
+    'createdAt' : Time,
+    'slotId' : IDL.Nat,
+    'dentistId' : IDL.Principal,
+  });
+  const AvailabilitySlot = IDL.Record({
+    'dateTimeLabel' : IDL.Text,
+    'slotId' : IDL.Nat,
+    'isBooked' : IDL.Bool,
+    'dentistId' : IDL.Principal,
+  });
+  const FeedbackEntry = IDL.Record({
+    'text' : IDL.Text,
+    'author' : IDL.Principal,
+    'timestamp' : Time,
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'addAvailabilitySlot' : IDL.Func([IDL.Text], [IDL.Nat], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'bookSlot' : IDL.Func([IDL.Principal, IDL.Nat], [IDL.Nat], []),
+    'completeBooking' : IDL.Func([IDL.Nat], [], []),
+    'confirmBooking' : IDL.Func([IDL.Nat], [], []),
+    'declineBooking' : IDL.Func([IDL.Nat], [], []),
     'deleteUserScans' : IDL.Func([], [], []),
+    'getAllDentists' : IDL.Func([], [IDL.Vec(DentistProfile)], ['query']),
+    'getBookingMessages' : IDL.Func([IDL.Nat], [IDL.Vec(Message)], ['query']),
     'getCallerLatestScan' : IDL.Func([], [IDL.Opt(ScanResult)], ['query']),
     'getCallerScanHistory' : IDL.Func([], [IDL.Vec(ScanResult)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getDentistBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
+    'getDentistLanguages' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(IDL.Vec(IDL.Text))],
+        ['query'],
+      ),
+    'getDentistProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(DentistProfile)],
+        ['query'],
+      ),
+    'getDentistSlots' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Vec(AvailabilitySlot)],
+        ['query'],
+      ),
+    'getFeedbackList' : IDL.Func([], [IDL.Vec(FeedbackEntry)], ['query']),
+    'getPatientBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
+    'getUnreadMessageCount' : IDL.Func([], [IDL.Nat], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
@@ -100,9 +255,18 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(ScanResult)],
         ['query'],
       ),
+    'getVisitorCount' : IDL.Func([], [IDL.Nat], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'markPaymentPaid' : IDL.Func([IDL.Nat], [], []),
+    'markPaymentReleased' : IDL.Func([IDL.Nat], [], []),
+    'recordVisit' : IDL.Func([], [], []),
+    'registerDentistProfile' : IDL.Func([DentistProfile], [], []),
+    'removeAvailabilitySlot' : IDL.Func([IDL.Nat], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'sendMessage' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Nat], []),
+    'submitFeedback' : IDL.Func([IDL.Text], [], []),
     'submitScan' : IDL.Func([ScanResult], [], []),
+    'updateDentistProfile' : IDL.Func([DentistProfile], [], []),
   });
 };
 

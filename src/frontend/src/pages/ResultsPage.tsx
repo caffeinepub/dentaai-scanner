@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   LogIn,
   LogOut,
+  MapPin,
   RotateCcw,
   Save,
   Share2,
@@ -78,6 +79,90 @@ function IssueCard({ tooth, index }: { tooth: ToothRecord; index: number }) {
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
             {tooth.recommendation}
           </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function TriageBanner({ score }: { score: number }) {
+  const navigate = useNavigate();
+
+  let severity: "Mild" | "Moderate" | "Severe";
+  let message: string;
+  let borderColor: string;
+  let bgColor: string;
+  let textColor: string;
+  let Icon: typeof CheckCircle2;
+
+  if (score >= 70) {
+    severity = "Mild";
+    message =
+      "Your scan looks mostly healthy. Monitor and maintain good hygiene.";
+    borderColor = "border-l-green-500";
+    bgColor = "bg-green-500/8";
+    textColor = "text-green-400";
+    Icon = CheckCircle2;
+  } else if (score >= 40) {
+    severity = "Moderate";
+    message = "Some issues detected. Consider visiting a dentist soon.";
+    borderColor = "border-l-yellow-500";
+    bgColor = "bg-yellow-500/8";
+    textColor = "text-yellow-400";
+    Icon = AlertTriangle;
+  } else {
+    severity = "Severe";
+    message =
+      "Significant issues detected. We recommend seeing an emergency dentist.";
+    borderColor = "border-l-red-500";
+    bgColor = "bg-red-500/8";
+    textColor = "text-red-400";
+    Icon = XCircle;
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: 0.15, duration: 0.5 }}
+      className={`glass-card rounded-3xl p-5 border-l-4 ${borderColor} ${bgColor}`}
+      data-ocid="results.triage.card"
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className={`circle-icon w-10 h-10 flex-shrink-0 ${
+            severity === "Mild"
+              ? "bg-green-500/15 border border-green-500/30"
+              : severity === "Moderate"
+                ? "bg-yellow-500/15 border border-yellow-500/30"
+                : "bg-red-500/15 border border-red-500/30"
+          }`}
+        >
+          <Icon className={`w-5 h-5 ${textColor}`} />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span
+              className={`text-xs font-bold uppercase tracking-wider ${textColor}`}
+            >
+              {severity}
+            </span>
+          </div>
+          <p className="text-sm text-foreground/80 leading-relaxed">
+            {message}
+          </p>
+          {(severity === "Moderate" || severity === "Severe") && (
+            <Button
+              size="sm"
+              className="mt-3 rounded-full glow-primary text-xs px-4 border border-yellow-500/40 bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20"
+              variant="outline"
+              onClick={() => navigate({ to: "/find-dentist" })}
+              data-ocid="results.find_dentist.button"
+            >
+              <MapPin className="w-3.5 h-3.5 mr-1.5" />
+              Find Emergency Dentist
+            </Button>
+          )}
         </div>
       </div>
     </motion.div>
@@ -245,6 +330,9 @@ export default function ResultsPage() {
             </div>
           </div>
         </motion.div>
+
+        {/* Triage Severity Banner */}
+        <TriageBanner score={score} />
 
         {/* 3D Arch */}
         <motion.div

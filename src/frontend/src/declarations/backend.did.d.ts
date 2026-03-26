@@ -10,6 +10,49 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface AvailabilitySlot {
+  'dateTimeLabel' : string,
+  'slotId' : bigint,
+  'isBooked' : boolean,
+  'dentistId' : Principal,
+}
+export interface Booking {
+  'status' : BookingStatus,
+  'paymentStatus' : PaymentStatus,
+  'bookingId' : bigint,
+  'patientId' : Principal,
+  'createdAt' : Time,
+  'slotId' : bigint,
+  'dentistId' : Principal,
+}
+export type BookingStatus = { 'pending' : null } |
+  { 'completed' : null } |
+  { 'confirmed' : null } |
+  { 'declined' : null };
+export interface DentistProfile {
+  'bio' : string,
+  'name' : string,
+  'languages' : Array<string>,
+  'specialty' : string,
+  'isVerified' : boolean,
+  'licenseNumber' : string,
+  'location' : string,
+}
+export interface FeedbackEntry {
+  'text' : string,
+  'author' : Principal,
+  'timestamp' : Time,
+}
+export interface Message {
+  'bookingId' : bigint,
+  'messageId' : bigint,
+  'text' : string,
+  'sender' : Principal,
+  'timestamp' : Time,
+}
+export type PaymentStatus = { 'paid' : null } |
+  { 'unpaid' : null } |
+  { 'released' : null };
 export interface ScanResult {
   'teeth' : Array<ToothRecord>,
   'overallScore' : bigint,
@@ -31,17 +74,40 @@ export type UserRole = { 'admin' : null } |
   { 'guest' : null };
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'addAvailabilitySlot' : ActorMethod<[string], bigint>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'bookSlot' : ActorMethod<[Principal, bigint], bigint>,
+  'completeBooking' : ActorMethod<[bigint], undefined>,
+  'confirmBooking' : ActorMethod<[bigint], undefined>,
+  'declineBooking' : ActorMethod<[bigint], undefined>,
   'deleteUserScans' : ActorMethod<[], undefined>,
+  'getAllDentists' : ActorMethod<[], Array<DentistProfile>>,
+  'getBookingMessages' : ActorMethod<[bigint], Array<Message>>,
   'getCallerLatestScan' : ActorMethod<[], [] | [ScanResult]>,
   'getCallerScanHistory' : ActorMethod<[], Array<ScanResult>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getDentistBookings' : ActorMethod<[], Array<Booking>>,
+  'getDentistLanguages' : ActorMethod<[Principal], [] | [Array<string>]>,
+  'getDentistProfile' : ActorMethod<[Principal], [] | [DentistProfile]>,
+  'getDentistSlots' : ActorMethod<[Principal], Array<AvailabilitySlot>>,
+  'getFeedbackList' : ActorMethod<[], Array<FeedbackEntry>>,
+  'getPatientBookings' : ActorMethod<[], Array<Booking>>,
+  'getUnreadMessageCount' : ActorMethod<[], bigint>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getUserScanHistory' : ActorMethod<[Principal], Array<ScanResult>>,
+  'getVisitorCount' : ActorMethod<[], bigint>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'markPaymentPaid' : ActorMethod<[bigint], undefined>,
+  'markPaymentReleased' : ActorMethod<[bigint], undefined>,
+  'recordVisit' : ActorMethod<[], undefined>,
+  'registerDentistProfile' : ActorMethod<[DentistProfile], undefined>,
+  'removeAvailabilitySlot' : ActorMethod<[bigint], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'sendMessage' : ActorMethod<[bigint, string], bigint>,
+  'submitFeedback' : ActorMethod<[string], undefined>,
   'submitScan' : ActorMethod<[ScanResult], undefined>,
+  'updateDentistProfile' : ActorMethod<[DentistProfile], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

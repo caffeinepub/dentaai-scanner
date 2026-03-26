@@ -1,20 +1,26 @@
 import LogoCircle from "@/components/LogoCircle";
 import { Button } from "@/components/ui/button";
+import { useActor } from "@/hooks/useActor";
 import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Activity,
+  Bell,
   Brain,
+  CalendarCheck,
   ChevronRight,
   History,
   LogIn,
   LogOut,
+  MapPin,
   QrCode,
   ScanLine,
   Shield,
+  Stethoscope,
   User,
 } from "lucide-react";
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
 
 const FEATURES = [
   {
@@ -48,6 +54,16 @@ const stats = [
 export default function HomePage() {
   const navigate = useNavigate();
   const { identity, login, clear } = useInternetIdentity();
+  const { actor } = useActor();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!actor || !identity) return;
+    actor
+      .getUnreadMessageCount()
+      .then((count) => setUnreadCount(Number(count)))
+      .catch(() => {});
+  }, [actor, identity]);
 
   const handleStartScan = () => {
     if (identity) {
@@ -59,12 +75,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen grid-bg flex flex-col">
-      {/* Header — three-column layout so logo is perfectly centered */}
+      {/* Header */}
       <header className="grid grid-cols-3 items-center px-6 py-4 md:px-10">
-        {/* Left spacer */}
-        <div className="flex justify-start">{/* intentional spacer */}</div>
+        <div className="flex justify-start" />
 
-        {/* Center: logo + brand name */}
         <div className="flex items-center justify-center gap-3">
           <LogoCircle size="sm" />
           <span className="font-display font-bold text-xl tracking-tight">
@@ -72,28 +86,52 @@ export default function HomePage() {
           </span>
         </div>
 
-        {/* Right: nav items */}
-        <nav className="flex items-center justify-end gap-2">
+        <nav className="flex items-center justify-end gap-1 flex-wrap">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate({ to: "/qr" })}
             data-ocid="home.link"
-            className="text-muted-foreground hover:text-foreground rounded-full px-4"
+            className="text-muted-foreground hover:text-foreground rounded-full px-3"
           >
-            <QrCode className="w-4 h-4 mr-2" />
-            QR Code
+            <QrCode className="w-4 h-4 mr-1.5" />
+            QR
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate({ to: "/find-dentist" })}
+            data-ocid="home.find_dentist.link"
+            className="text-muted-foreground hover:text-yellow-400 rounded-full px-3"
+          >
+            <MapPin className="w-4 h-4 mr-1.5" />
+            Dentist
           </Button>
           {identity ? (
             <>
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={() => navigate({ to: "/my-bookings" })}
+                data-ocid="home.link"
+                className="text-muted-foreground hover:text-foreground rounded-full px-3 relative"
+              >
+                <CalendarCheck className="w-4 h-4 mr-1.5" />
+                Bookings
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-500 text-black text-[9px] font-bold flex items-center justify-center">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => navigate({ to: "/history" })}
                 data-ocid="home.link"
-                className="text-muted-foreground hover:text-foreground rounded-full px-4"
+                className="text-muted-foreground hover:text-foreground rounded-full px-3"
               >
-                <History className="w-4 h-4 mr-2" />
+                <History className="w-4 h-4 mr-1.5" />
                 History
               </Button>
               <Button
@@ -101,20 +139,18 @@ export default function HomePage() {
                 size="sm"
                 onClick={() => navigate({ to: "/profile" })}
                 data-ocid="home.profile_button"
-                className="text-muted-foreground hover:text-foreground rounded-full px-4"
+                className="text-muted-foreground hover:text-foreground rounded-full px-3"
               >
-                <User className="w-4 h-4 mr-2" />
-                Profile
+                <User className="w-4 h-4" />
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => clear()}
                 data-ocid="home.secondary_button"
-                className="rounded-full px-4 border-primary/40 text-primary hover:bg-primary/10"
+                className="rounded-full px-3 border-primary/40 text-primary hover:bg-primary/10"
               >
-                <LogOut className="w-4 h-4 mr-1.5" />
-                Sign Out
+                <LogOut className="w-4 h-4" />
               </Button>
             </>
           ) : (
@@ -140,7 +176,6 @@ export default function HomePage() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="flex flex-col items-center text-center max-w-2xl"
         >
-          {/* Hero logo */}
           <div className="relative mb-6">
             <div className="absolute inset-[-20px] rounded-full border border-primary/10" />
             <div className="absolute inset-[-10px] rounded-full border border-primary/15" />
@@ -151,7 +186,6 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Tagline */}
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -188,7 +222,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 mt-10"
+            className="flex flex-col sm:flex-row gap-4 mt-10 flex-wrap justify-center"
           >
             <Button
               size="lg"
@@ -209,24 +243,60 @@ export default function HomePage() {
                 data-ocid="home.link"
               >
                 <History className="w-5 h-5 mr-2" />
-                View Scan History
+                Scan History
               </Button>
             ) : null}
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-base px-8 py-6 rounded-full border-yellow-500/40 text-yellow-400 hover:bg-yellow-500/10"
+              onClick={() => navigate({ to: "/find-dentist" })}
+              data-ocid="home.find_dentist.button"
+            >
+              <MapPin className="w-5 h-5 mr-2" />
+              Find Emergency Dentist
+            </Button>
           </motion.div>
 
-          {/* Sign in hint for unauthenticated users */}
-          {!identity && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.55, duration: 0.5 }}
-              className="mt-4"
-            >
+          {/* Dentist / bookings quick links */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.55, duration: 0.5 }}
+            className="flex flex-wrap items-center justify-center gap-4 mt-4"
+          >
+            {identity ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-sm text-muted-foreground hover:text-yellow-400 rounded-full"
+                onClick={() => navigate({ to: "/my-bookings" })}
+                data-ocid="home.link"
+              >
+                <CalendarCheck className="w-4 h-4 mr-1.5" />
+                My Bookings
+                {unreadCount > 0 && (
+                  <span className="ml-1.5 w-4 h-4 rounded-full bg-yellow-500 text-black text-[9px] font-bold flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </Button>
+            ) : (
               <p className="text-xs text-muted-foreground">
                 Sign in required to start a scan and save your reports.
               </p>
-            </motion.div>
-          )}
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-sm text-muted-foreground hover:text-yellow-400 rounded-full"
+              onClick={() => navigate({ to: "/dentist-register" })}
+              data-ocid="home.link"
+            >
+              <Stethoscope className="w-4 h-4 mr-1.5" />
+              Are you a dentist? Register here
+            </Button>
+          </motion.div>
 
           {/* Stats */}
           <motion.div
@@ -279,7 +349,7 @@ export default function HomePage() {
           ))}
         </motion.div>
       </main>
-      {/* Footer */}
+
       <footer className="py-6 text-center text-xs text-muted-foreground border-t border-border/30">
         <p>
           © {new Date().getFullYear()} DantaNova ·{" "}

@@ -3,8 +3,14 @@ import FloatingFeedback from "@/components/FloatingFeedback";
 import { Toaster } from "@/components/ui/sonner";
 import { ScanProvider } from "@/context/ScanContext";
 import AnalysisPage from "@/pages/AnalysisPage";
+import BookByCodePage from "@/pages/BookByCodePage";
+import DentistDashboardPage from "@/pages/DentistDashboardPage";
+import DentistRegisterPage from "@/pages/DentistRegisterPage";
+import FindDentistPage from "@/pages/FindDentistPage";
 import HistoryPage from "@/pages/HistoryPage";
 import HomePage from "@/pages/HomePage";
+import MessagesPage from "@/pages/MessagesPage";
+import MyBookingsPage from "@/pages/MyBookingsPage";
 import PrivacyPage from "@/pages/PrivacyPage";
 import ProfilePage from "@/pages/ProfilePage";
 import QRCodePage from "@/pages/QRCodePage";
@@ -84,6 +90,42 @@ const termsRoute = createRoute({
   component: TermsPage,
 });
 
+const findDentistRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/find-dentist",
+  component: FindDentistPage,
+});
+
+const dentistRegisterRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/dentist-register",
+  component: DentistRegisterPage,
+});
+
+const dentistDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/dentist-dashboard",
+  component: DentistDashboardPage,
+});
+
+const bookRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/book",
+  component: BookByCodePage,
+});
+
+const myBookingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/my-bookings",
+  component: MyBookingsPage,
+});
+
+const messagesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/messages/$bookingId",
+  component: MessagesPage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   scanRoute,
@@ -94,6 +136,12 @@ const routeTree = rootRoute.addChildren([
   profileRoute,
   privacyRoute,
   termsRoute,
+  findDentistRoute,
+  dentistRegisterRoute,
+  dentistDashboardRoute,
+  bookRoute,
+  myBookingsRoute,
+  messagesRoute,
 ]);
 
 const router = createRouter({ routeTree });
