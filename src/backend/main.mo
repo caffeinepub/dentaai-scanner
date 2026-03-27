@@ -11,8 +11,9 @@ import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import Migration "migration";
 
-
+(with migration = Migration.run)
 actor {
   // ===================== TYPES ==============================
   type ToothStatus = {
@@ -42,6 +43,7 @@ actor {
 
   public type UserProfile = {
     name : Text;
+    email : Text;
   };
 
   public type FeedbackEntry = {
@@ -52,6 +54,7 @@ actor {
 
   public type DentistProfile = {
     name : Text;
+    email : Text;
     specialty : Text;
     licenseNumber : Text;
     location : Text;
@@ -108,6 +111,11 @@ actor {
     timestamp : Time.Time;
   };
 
+  public type DentistWithPrincipal = {
+    profile : DentistProfile;
+    principal : Principal;
+  };
+
   // ===================== STATE ==============================
 
   let accessControlState = AccessControl.initState();
@@ -122,6 +130,7 @@ actor {
   let messages = Map.empty<Nat, Message>();
   let testimonials = Map.empty<Nat, Testimonial>();
   let visitors = Map.empty<Principal, Bool>();
+  let emailToDentistPrincipal = Map.empty<Text, Principal>();
 
   var feedbackCount : Nat = 0;
   var visitorCount : Nat = 0;
@@ -273,6 +282,7 @@ actor {
     };
     let newProfile : DentistProfile = { profile with isVerified = false };
     dentistProfiles.add(caller, newProfile);
+    emailToDentistPrincipal.add(profile.email, caller);
   };
 
   public shared ({ caller }) func updateDentistProfile(profile : DentistProfile) : async () {
@@ -289,6 +299,7 @@ actor {
           isVerified = existingProfile.isVerified
         };
         dentistProfiles.add(caller, updatedProfile);
+        emailToDentistPrincipal.add(profile.email, caller);
       };
     };
   };
@@ -306,6 +317,26 @@ actor {
     switch (dentistProfiles.get(dentist)) {
       case (null) { null };
       case (?profile) { ?profile.languages };
+    };
+  };
+
+  public query ({ caller }) func getDentistByEmail(email : Text) : async ?DentistWithPrincipal {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can lookup dentists by email");
+    };
+    switch (emailToDentistPrincipal.get(email)) {
+      case (null) { return null };
+      case (?dentistPrincipal) {
+        switch (dentistProfiles.get(dentistPrincipal)) {
+          case (null) { return null };
+          case (?profile) {
+            ?{
+              profile;
+              principal = dentistPrincipal;
+            };
+          };
+        };
+      };
     };
   };
 
@@ -591,7 +622,7 @@ actor {
     if (name.size() == 0 or quote.size() == 0) {
       Runtime.trap("Name and review text are required");
     };
-    let clampedRating = if (rating < 1) 1 else if (rating > 5) 5 else rating;
+    let clampedRating = if (rating < 1) { 1 } else if (rating > 5) { 5 } else { rating };
     let t : Testimonial = {
       testimonialId = nextTestimonialId;
       author = caller;

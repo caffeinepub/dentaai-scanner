@@ -1,34 +1,32 @@
-# DantaNova — Real Dentist-Patient Connection
+# DantaNova
 
 ## Current State
-The app has a `/find-dentist` page with 6 hardcoded sample dentist profiles. The "Request Appointment" button shows a toast but does nothing real. No dentist registration, no real booking, no messaging, no payment.
+UserProfile has only `name`. DentistProfile has `name`, specialty, license, location, bio, languages -- no email. Dentist Booking Code shown in dashboard is the cryptographic Principal ID (long random string). BookByCodePage requires pasting the full Principal ID to find a dentist.
 
 ## Requested Changes (Diff)
 
 ### Add
-- **Dentist Registration** — dentists sign up with name, specialty, license number, location, languages, bio; stored on backend
-- **Dentist Availability** — dentists set available date/time slots from their dashboard
-- **Booking System** — patient selects a time slot from a dentist's real availability, creates a booking request; dentist can confirm or decline from their dashboard
-- **In-App Messaging** — per-booking chat between patient and dentist; both sides can send/read messages
-- **Simulated Payment** — patient marks payment as "paid" when booking is confirmed; dentist sees payment status as "received" after visit is marked complete
-- **Dentist Dashboard** — manage profile, availability slots, incoming booking requests, and messages
-- **Patient Bookings Page** — patients see all their bookings with status, can message dentist, mark visit complete
-- **In-app notification badges** — unread message count shown on navigation
+- `email` field to `UserProfile` (name + email)
+- `email` field to `DentistProfile`
+- Backend map `emailToDentistPrincipal: Map<Text, Principal>` for email-based lookup
+- Backend query `getDentistByEmail(email: Text): async ?{profile: DentistProfile; principal: Principal}` returning profile and principal
+- Backend query `getUserByEmail` equivalent via stored email in profile
 
 ### Modify
-- **FindDentistPage** — fetch dentists from backend instead of hardcoded data; "Book" button navigates to real booking flow
-- **App.tsx** — add new routes: /dentist-register, /dentist-dashboard, /book, /my-bookings, /messages/:bookingId
+- `registerDentistProfile` and `updateDentistProfile`: store email in emailToDentistPrincipal map
+- `saveCallerUserProfile`: now accepts `{name: Text; email: Text}`
+- DentistRegisterPage: add email input field
+- DentistDashboardPage: show dentist's email as the Booking Code (instead of Principal ID)
+- BookByCodePage: search by email address (not Principal ID), UI updated to say "Enter Dentist Email"
+- ProfilePage: show email; add form to save name + email
 
 ### Remove
-- Hardcoded DENTISTS array from FindDentistPage
+- Nothing removed
 
 ## Implementation Plan
-1. Backend: Add DentistProfile, AvailabilitySlot, Booking, Message types and all CRUD methods
+1. Update Motoko backend: add email to UserProfile, add email to DentistProfile, add emailToDentistPrincipal map, add getDentistByEmail query
 2. Regenerate backend bindings
-3. Frontend: DentistRegisterPage — form to sign up as a dentist
-4. Frontend: DentistDashboardPage — manage availability, view/confirm bookings, chat
-5. Frontend: BookingPage — patient picks a slot and submits booking request
-6. Frontend: MyBookingsPage — patient's booking history with status and messaging
-7. Frontend: MessagingPage — in-app chat per booking
-8. Update FindDentistPage to use real backend data
-9. Add routes in App.tsx
+3. Update DentistRegisterPage to include email field
+4. Update DentistDashboardPage: Booking Code section shows dentist's email
+5. Update BookByCodePage: search by email, calls getDentistByEmail
+6. Update ProfilePage: show email, allow saving name + email

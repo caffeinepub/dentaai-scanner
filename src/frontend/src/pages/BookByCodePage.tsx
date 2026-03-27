@@ -32,21 +32,20 @@ export default function BookByCodePage() {
     setSlots([]);
     setSelectedSlot(null);
     try {
-      const { Principal } = await import("@icp-sdk/core/principal");
-      const principal = Principal.fromText(code.trim());
-      const [profile, availableSlots] = await Promise.all([
-        actor.getDentistProfile(principal),
-        actor.getDentistSlots(principal),
-      ]);
-      if (!profile) {
-        toast.error("No dentist found with that booking code.");
+      const result = await actor.getDentistByEmail(code.trim());
+      if (!result) {
+        toast.error("No dentist found with that email address.");
         return;
       }
+      const { profile, principal } = result;
+      const availableSlots = await actor.getDentistSlots(principal);
       setDentistProfile(profile);
       setSlots(availableSlots.filter((s) => !s.isBooked));
-      setDentistPrincipalStr(code.trim());
+      setDentistPrincipalStr(principal.toString());
     } catch {
-      toast.error("Invalid booking code. Please check and try again.");
+      toast.error(
+        "Could not find dentist. Please check the email and try again.",
+      );
     } finally {
       setSearching(false);
     }
@@ -103,10 +102,10 @@ export default function BookByCodePage() {
         <LogoCircle size="sm" />
         <div className="flex-1">
           <h1 className="font-display font-bold text-lg">
-            Book by Dentist Code
+            Book by Dentist Email
           </h1>
           <p className="text-xs text-muted-foreground">
-            Enter the dentist's booking code to see their slots
+            Enter the dentist's email to see their available slots
           </p>
         </div>
       </header>
@@ -120,18 +119,19 @@ export default function BookByCodePage() {
           data-ocid="book.panel"
         >
           <p className="text-sm font-semibold text-yellow-400">
-            Enter Dentist's Booking Code
+            Enter Dentist's Email
           </p>
           <p className="text-xs text-muted-foreground">
-            Ask your dentist to share their Principal ID (booking code) from
-            their dashboard.
+            Ask your dentist to share their email address from their dashboard.
           </p>
           <div className="flex gap-2">
             <Input
+              type="email"
               className="rounded-2xl bg-background/60 border-border/40 flex-1 text-xs"
-              placeholder="e.g. 2vxsx-fae..."
+              placeholder="e.g. dentist@example.com"
               value={code}
               onChange={(e) => setCode(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && searchDentist()}
               data-ocid="book.input"
             />
             <Button

@@ -22,6 +22,7 @@ export default function DentistRegisterPage() {
 
   const [form, setForm] = useState({
     name: "",
+    email: "",
     specialty: "",
     licenseNumber: "",
     location: "",
@@ -42,6 +43,7 @@ export default function DentistRegisterPage() {
           setIsUpdate(true);
           setForm({
             name: profile.name,
+            email: profile.email ?? "",
             specialty: profile.specialty,
             licenseNumber: profile.licenseNumber,
             location: profile.location,
@@ -61,6 +63,7 @@ export default function DentistRegisterPage() {
     try {
       const profile = {
         name: form.name.trim(),
+        email: form.email.trim(),
         specialty: form.specialty.trim(),
         licenseNumber: form.licenseNumber.trim(),
         location: form.location.trim(),
@@ -159,6 +162,23 @@ export default function DentistRegisterPage() {
                   value={form.name}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, name: e.target.value }))
+                  }
+                  required
+                  data-ocid="dentist_register.input"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label className="text-sm text-muted-foreground">
+                  Email Address
+                </Label>
+                <Input
+                  type="email"
+                  className="rounded-2xl bg-background/60 border-border/40"
+                  placeholder="doctor@example.com"
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, email: e.target.value }))
                   }
                   required
                   data-ocid="dentist_register.input"

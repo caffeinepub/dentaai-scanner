@@ -1,41 +1,88 @@
 import Map "mo:core/Map";
-import Time "mo:core/Time";
 import Principal "mo:core/Principal";
-import Text "mo:core/Text";
-import AccessControl "authorization/access-control";
+import Nat "mo:core/Nat";
 
 module {
-  // Persistent types
-  type ToothStatus = {
+  type OldToothStatus = {
     #healthy;
     #risk;
     #cavity;
   };
 
-  type ToothRecord = {
+  type OldToothRecord = {
     number : Nat;
-    status : ToothStatus;
+    status : OldToothStatus;
     condition : Text;
     recommendation : Text;
   };
 
-  type ScanResult = {
-    timestamp : Time.Time;
+  type OldScanResult = {
+    timestamp : Int;
     overallScore : Nat;
-    teeth : [ToothRecord];
+    teeth : [OldToothRecord];
   };
 
-  public type UserProfile = {
+  type OldFeedbackEntry = {
+    author : Principal;
+    text : Text;
+    timestamp : Int;
+  };
+
+  type OldMessage = {
+    messageId : Nat;
+    bookingId : Nat;
+    sender : Principal;
+    text : Text;
+    timestamp : Int;
+  };
+
+  type OldTestimonial = {
+    testimonialId : Nat;
+    author : Principal;
+    name : Text;
+    role : Text;
+    quote : Text;
+    rating : Nat;
+    timestamp : Int;
+  };
+
+  type OldTestimonialMap = Map.Map<Nat, OldTestimonial>;
+
+  type OldBookingStatus = {
+    #pending;
+    #confirmed;
+    #declined;
+    #completed;
+  };
+
+  type OldPaymentStatus = {
+    #unpaid;
+    #paid;
+    #released;
+  };
+
+  type OldBooking = {
+    bookingId : Nat;
+    patientId : Principal;
+    dentistId : Principal;
+    slotId : Nat;
+    status : OldBookingStatus;
+    paymentStatus : OldPaymentStatus;
+    createdAt : Int;
+  };
+
+  type OldAvailabilitySlot = {
+    slotId : Nat;
+    dentistId : Principal;
+    dateTimeLabel : Text;
+    isBooked : Bool;
+  };
+
+  type OldUserProfile = {
     name : Text;
   };
 
-  public type FeedbackEntry = {
-    author : Principal;
-    text : Text;
-    timestamp : Time.Time;
-  };
-
-  type DentistProfile = {
+  type OldDentistProfile = {
     name : Text;
     specialty : Text;
     licenseNumber : Text;
@@ -45,84 +92,127 @@ module {
     isVerified : Bool;
   };
 
-  type AvailabilitySlot = {
-    slotId : Nat;
-    dentistId : Principal;
-    dateTimeLabel : Text;
-    isBooked : Bool;
-  };
-
-  type BookingStatus = {
-    #pending;
-    #confirmed;
-    #declined;
-    #completed;
-  };
-
-  type PaymentStatus = {
-    #unpaid;
-    #paid;
-    #released;
-  };
-
-  type Booking = {
-    bookingId : Nat;
-    patientId : Principal;
-    dentistId : Principal;
-    slotId : Nat;
-    status : BookingStatus;
-    paymentStatus : PaymentStatus;
-    createdAt : Time.Time;
-  };
-
-  type Message = {
-    messageId : Nat;
-    bookingId : Nat;
-    sender : Principal;
-    text : Text;
-    timestamp : Time.Time;
-  };
-
-  // Old actor state (without new persistent fields)
   type OldActor = {
-    accessControlState : AccessControl.AccessControlState;
-    userScanResults : Map.Map<Principal, [ScanResult]>;
-    userProfiles : Map.Map<Principal, UserProfile>;
-    feedbackList : Map.Map<Nat, FeedbackEntry>;
-    visitors : Map.Map<Principal, Bool>;
-    feedbackCount : Nat;
-    visitorCount : Nat;
-  };
-
-  // New actor state (with new persistent fields initialized)
-  type NewActor = {
-    accessControlState : AccessControl.AccessControlState;
-    userScanResults : Map.Map<Principal, [ScanResult]>;
-    userProfiles : Map.Map<Principal, UserProfile>;
-    feedbackList : Map.Map<Nat, FeedbackEntry>;
-    dentistProfiles : Map.Map<Principal, DentistProfile>;
-    availabilitySlots : Map.Map<Nat, AvailabilitySlot>;
-    bookings : Map.Map<Nat, Booking>;
-    messages : Map.Map<Nat, Message>;
+    userScanResults : Map.Map<Principal, [OldScanResult]>;
+    userProfiles : Map.Map<Principal, OldUserProfile>;
+    feedbackList : Map.Map<Nat, OldFeedbackEntry>;
+    dentistProfiles : Map.Map<Principal, OldDentistProfile>;
+    availabilitySlots : Map.Map<Nat, OldAvailabilitySlot>;
+    bookings : Map.Map<Nat, OldBooking>;
+    messages : Map.Map<Nat, OldMessage>;
+    testimonials : OldTestimonialMap;
     visitors : Map.Map<Principal, Bool>;
     feedbackCount : Nat;
     visitorCount : Nat;
     nextSlotId : Nat;
     nextBookingId : Nat;
     nextMessageId : Nat;
+    nextTestimonialId : Nat;
   };
 
-  public func run(old : OldActor) : NewActor {
+  func convertOldUserProfileToNew(old : OldUserProfile) : { name : Text; email : Text } {
+    { name = old.name; email = "" };
+  };
+
+  func convertOldDentistProfileToNew(old : OldDentistProfile) : {
+    name : Text;
+    email : Text;
+    specialty : Text;
+    licenseNumber : Text;
+    location : Text;
+    languages : [Text];
+    bio : Text;
+    isVerified : Bool;
+  } {
     {
-      old with
-      dentistProfiles = Map.empty<Principal, DentistProfile>();
-      availabilitySlots = Map.empty<Nat, AvailabilitySlot>();
-      bookings = Map.empty<Nat, Booking>();
-      messages = Map.empty<Nat, Message>();
-      nextSlotId = 1;
-      nextBookingId = 1;
-      nextMessageId = 1;
+      name = old.name;
+      email = "";
+      specialty = old.specialty;
+      licenseNumber = old.licenseNumber;
+      location = old.location;
+      languages = old.languages;
+      bio = old.bio;
+      isVerified = old.isVerified;
+    };
+  };
+
+  type NewToothStatus = {
+    #healthy;
+    #risk;
+    #cavity;
+  };
+
+  type NewToothRecord = {
+    number : Nat;
+    status : NewToothStatus;
+    condition : Text;
+    recommendation : Text;
+  };
+
+  type NewScanResult = {
+    timestamp : Int;
+    overallScore : Nat;
+    teeth : [NewToothRecord];
+  };
+
+  type NewUserProfile = {
+    name : Text;
+    email : Text;
+  };
+
+  type NewDentistProfile = {
+    name : Text;
+    email : Text;
+    specialty : Text;
+    licenseNumber : Text;
+    location : Text;
+    languages : [Text];
+    bio : Text;
+    isVerified : Bool;
+  };
+
+  type NewActor = {
+    userScanResults : Map.Map<Principal, [NewScanResult]>;
+    userProfiles : Map.Map<Principal, NewUserProfile>;
+    feedbackList : Map.Map<Nat, OldFeedbackEntry>;
+    dentistProfiles : Map.Map<Principal, NewDentistProfile>;
+    availabilitySlots : Map.Map<Nat, OldAvailabilitySlot>;
+    bookings : Map.Map<Nat, OldBooking>;
+    messages : Map.Map<Nat, OldMessage>;
+    testimonials : OldTestimonialMap;
+    visitors : Map.Map<Principal, Bool>;
+    emailToDentistPrincipal : Map.Map<Text, Principal>;
+    feedbackCount : Nat;
+    visitorCount : Nat;
+    nextSlotId : Nat;
+    nextBookingId : Nat;
+    nextMessageId : Nat;
+    nextTestimonialId : Nat;
+  };
+  public func run(old : OldActor) : NewActor {
+    let newUserProfiles = old.userProfiles.map<Principal, OldUserProfile, NewUserProfile>(
+      func(_p, oldProfile) { convertOldUserProfileToNew(oldProfile) }
+    );
+    let newDentistProfiles = old.dentistProfiles.map<Principal, OldDentistProfile, NewDentistProfile>(
+      func(_p, oldProfile) { convertOldDentistProfileToNew(oldProfile) }
+    );
+    {
+      userScanResults = old.userScanResults;
+      userProfiles = newUserProfiles;
+      feedbackList = old.feedbackList;
+      dentistProfiles = newDentistProfiles;
+      availabilitySlots = old.availabilitySlots;
+      bookings = old.bookings;
+      messages = old.messages;
+      testimonials = old.testimonials;
+      visitors = old.visitors;
+      emailToDentistPrincipal = Map.empty<Text, Principal>();
+      feedbackCount = old.feedbackCount;
+      visitorCount = old.visitorCount;
+      nextSlotId = old.nextSlotId;
+      nextBookingId = old.nextBookingId;
+      nextMessageId = old.nextMessageId;
+      nextTestimonialId = old.nextTestimonialId;
     };
   };
 };
-

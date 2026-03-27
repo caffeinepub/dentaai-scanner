@@ -33,10 +33,15 @@ export interface DentistProfile {
   'bio' : string,
   'name' : string,
   'languages' : Array<string>,
+  'email' : string,
   'specialty' : string,
   'isVerified' : boolean,
   'licenseNumber' : string,
   'location' : string,
+}
+export interface DentistWithPrincipal {
+  'principal' : Principal,
+  'profile' : DentistProfile,
 }
 export interface FeedbackEntry {
   'text' : string,
@@ -58,6 +63,15 @@ export interface ScanResult {
   'overallScore' : bigint,
   'timestamp' : Time,
 }
+export interface Testimonial {
+  'testimonialId' : bigint,
+  'name' : string,
+  'role' : string,
+  'quote' : string,
+  'author' : Principal,
+  'timestamp' : Time,
+  'rating' : bigint,
+}
 export type Time = bigint;
 export interface ToothRecord {
   'status' : ToothStatus,
@@ -68,7 +82,7 @@ export interface ToothRecord {
 export type ToothStatus = { 'risk' : null } |
   { 'healthy' : null } |
   { 'cavity' : null };
-export interface UserProfile { 'name' : string }
+export interface UserProfile { 'name' : string, 'email' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
@@ -88,11 +102,13 @@ export interface _SERVICE {
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getDentistBookings' : ActorMethod<[], Array<Booking>>,
+  'getDentistByEmail' : ActorMethod<[string], [] | [DentistWithPrincipal]>,
   'getDentistLanguages' : ActorMethod<[Principal], [] | [Array<string>]>,
   'getDentistProfile' : ActorMethod<[Principal], [] | [DentistProfile]>,
   'getDentistSlots' : ActorMethod<[Principal], Array<AvailabilitySlot>>,
   'getFeedbackList' : ActorMethod<[], Array<FeedbackEntry>>,
   'getPatientBookings' : ActorMethod<[], Array<Booking>>,
+  'getTestimonials' : ActorMethod<[], Array<Testimonial>>,
   'getUnreadMessageCount' : ActorMethod<[], bigint>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getUserScanHistory' : ActorMethod<[Principal], Array<ScanResult>>,
@@ -107,6 +123,7 @@ export interface _SERVICE {
   'sendMessage' : ActorMethod<[bigint, string], bigint>,
   'submitFeedback' : ActorMethod<[string], undefined>,
   'submitScan' : ActorMethod<[ScanResult], undefined>,
+  'submitTestimonial' : ActorMethod<[string, string, string, bigint], bigint>,
   'updateDentistProfile' : ActorMethod<[DentistProfile], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;

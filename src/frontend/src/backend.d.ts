@@ -7,22 +7,38 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export interface ToothRecord {
-    status: ToothStatus;
-    number: bigint;
-    recommendation: string;
-    condition: string;
-}
 export type Time = bigint;
 export interface ScanResult {
     teeth: Array<ToothRecord>;
     overallScore: bigint;
     timestamp: Time;
 }
+export interface DentistWithPrincipal {
+    principal: Principal;
+    profile: DentistProfile;
+}
+export interface AvailabilitySlot {
+    dateTimeLabel: string;
+    slotId: bigint;
+    isBooked: boolean;
+    dentistId: Principal;
+}
+export interface FeedbackEntry {
+    text: string;
+    author: Principal;
+    timestamp: Time;
+}
+export interface ToothRecord {
+    status: ToothStatus;
+    number: bigint;
+    recommendation: string;
+    condition: string;
+}
 export interface DentistProfile {
     bio: string;
     name: string;
     languages: Array<string>;
+    email: string;
     specialty: string;
     isVerified: boolean;
     licenseNumber: string;
@@ -44,19 +60,18 @@ export interface Booking {
     slotId: bigint;
     dentistId: Principal;
 }
-export interface AvailabilitySlot {
-    dateTimeLabel: string;
-    slotId: bigint;
-    isBooked: boolean;
-    dentistId: Principal;
-}
-export interface FeedbackEntry {
-    text: string;
-    author: Principal;
-    timestamp: Time;
-}
 export interface UserProfile {
     name: string;
+    email: string;
+}
+export interface Testimonial {
+    testimonialId: bigint;
+    name: string;
+    role: string;
+    quote: string;
+    author: Principal;
+    timestamp: Time;
+    rating: bigint;
 }
 export enum BookingStatus {
     pending = "pending",
@@ -94,11 +109,13 @@ export interface backendInterface {
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getDentistBookings(): Promise<Array<Booking>>;
+    getDentistByEmail(email: string): Promise<DentistWithPrincipal | null>;
     getDentistLanguages(dentist: Principal): Promise<Array<string> | null>;
     getDentistProfile(dentist: Principal): Promise<DentistProfile | null>;
     getDentistSlots(dentistId: Principal): Promise<Array<AvailabilitySlot>>;
     getFeedbackList(): Promise<Array<FeedbackEntry>>;
     getPatientBookings(): Promise<Array<Booking>>;
+    getTestimonials(): Promise<Array<Testimonial>>;
     getUnreadMessageCount(): Promise<bigint>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getUserScanHistory(user: Principal): Promise<Array<ScanResult>>;
@@ -113,5 +130,6 @@ export interface backendInterface {
     sendMessage(bookingId: bigint, text: string): Promise<bigint>;
     submitFeedback(text: string): Promise<void>;
     submitScan(scan: ScanResult): Promise<void>;
+    submitTestimonial(name: string, role: string, quote: string, rating: bigint): Promise<bigint>;
     updateDentistProfile(profile: DentistProfile): Promise<void>;
 }

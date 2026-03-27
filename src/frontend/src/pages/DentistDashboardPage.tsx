@@ -50,9 +50,6 @@ export default function DentistDashboardPage() {
   const [newSlot, setNewSlot] = useState("");
   const [addingSlot, setAddingSlot] = useState(false);
 
-  const myPrincipal = identity?.getPrincipal();
-  const principalStr = myPrincipal?.toString() ?? "";
-
   useEffect(() => {
     if (!actor || isFetching || !identity) {
       if (!isFetching) setLoading(false);
@@ -73,9 +70,9 @@ export default function DentistDashboardPage() {
       .finally(() => setLoading(false));
   }, [actor, isFetching, identity]);
 
-  const copyPrincipal = () => {
-    navigator.clipboard.writeText(principalStr);
-    toast.success("Booking code copied!");
+  const copyEmail = () => {
+    navigator.clipboard.writeText(profile?.email ?? "");
+    toast.success("Booking email copied!");
   };
 
   const addSlot = async () => {
@@ -273,6 +270,10 @@ export default function DentistDashboardPage() {
                   </div>
                   <div className="flex flex-col gap-2 text-sm">
                     <p>
+                      <span className="text-muted-foreground">Email: </span>
+                      {profile.email}
+                    </p>
+                    <p>
                       <span className="text-muted-foreground">License: </span>
                       {profile.licenseNumber}
                     </p>
@@ -301,24 +302,25 @@ export default function DentistDashboardPage() {
                   </Button>
                 </div>
 
-                {/* Booking Code */}
+                {/* Booking Email */}
                 <div className="glass-card rounded-3xl p-5">
                   <p className="text-sm font-semibold text-yellow-400 mb-2">
-                    Your Booking Code
+                    Your Booking Email
                   </p>
                   <p className="text-xs text-muted-foreground mb-3">
-                    Share this code with patients so they can book appointments
-                    with you.
+                    Share your email address with patients so they can book
+                    appointments with you.
                   </p>
                   <div className="flex items-center gap-2">
                     <code className="flex-1 text-xs bg-yellow-500/10 border border-yellow-500/30 rounded-2xl px-3 py-2 text-yellow-300 break-all">
-                      {principalStr}
+                      {profile.email || "No email set — update your profile"}
                     </code>
                     <Button
                       size="icon"
                       variant="ghost"
                       className="rounded-full h-9 w-9 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 flex-shrink-0"
-                      onClick={copyPrincipal}
+                      onClick={copyEmail}
+                      disabled={!profile.email}
                       data-ocid="dentist_dashboard.toggle"
                     >
                       <Copy className="w-4 h-4" />

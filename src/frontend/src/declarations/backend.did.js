@@ -17,6 +17,7 @@ export const DentistProfile = IDL.Record({
   'bio' : IDL.Text,
   'name' : IDL.Text,
   'languages' : IDL.Vec(IDL.Text),
+  'email' : IDL.Text,
   'specialty' : IDL.Text,
   'isVerified' : IDL.Bool,
   'licenseNumber' : IDL.Text,
@@ -46,7 +47,10 @@ export const ScanResult = IDL.Record({
   'overallScore' : IDL.Nat,
   'timestamp' : Time,
 });
-export const UserProfile = IDL.Record({ 'name' : IDL.Text });
+export const UserProfile = IDL.Record({
+  'name' : IDL.Text,
+  'email' : IDL.Text,
+});
 export const BookingStatus = IDL.Variant({
   'pending' : IDL.Null,
   'completed' : IDL.Null,
@@ -67,6 +71,10 @@ export const Booking = IDL.Record({
   'slotId' : IDL.Nat,
   'dentistId' : IDL.Principal,
 });
+export const DentistWithPrincipal = IDL.Record({
+  'principal' : IDL.Principal,
+  'profile' : DentistProfile,
+});
 export const AvailabilitySlot = IDL.Record({
   'dateTimeLabel' : IDL.Text,
   'slotId' : IDL.Nat,
@@ -77,6 +85,15 @@ export const FeedbackEntry = IDL.Record({
   'text' : IDL.Text,
   'author' : IDL.Principal,
   'timestamp' : Time,
+});
+export const Testimonial = IDL.Record({
+  'testimonialId' : IDL.Nat,
+  'name' : IDL.Text,
+  'role' : IDL.Text,
+  'quote' : IDL.Text,
+  'author' : IDL.Principal,
+  'timestamp' : Time,
+  'rating' : IDL.Nat,
 });
 
 export const idlService = IDL.Service({
@@ -95,6 +112,11 @@ export const idlService = IDL.Service({
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getDentistBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
+  'getDentistByEmail' : IDL.Func(
+      [IDL.Text],
+      [IDL.Opt(DentistWithPrincipal)],
+      ['query'],
+    ),
   'getDentistLanguages' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(IDL.Vec(IDL.Text))],
@@ -112,6 +134,7 @@ export const idlService = IDL.Service({
     ),
   'getFeedbackList' : IDL.Func([], [IDL.Vec(FeedbackEntry)], ['query']),
   'getPatientBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
+  'getTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
   'getUnreadMessageCount' : IDL.Func([], [IDL.Nat], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
@@ -134,6 +157,11 @@ export const idlService = IDL.Service({
   'sendMessage' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Nat], []),
   'submitFeedback' : IDL.Func([IDL.Text], [], []),
   'submitScan' : IDL.Func([ScanResult], [], []),
+  'submitTestimonial' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
+      [IDL.Nat],
+      [],
+    ),
   'updateDentistProfile' : IDL.Func([DentistProfile], [], []),
 });
 
@@ -149,6 +177,7 @@ export const idlFactory = ({ IDL }) => {
     'bio' : IDL.Text,
     'name' : IDL.Text,
     'languages' : IDL.Vec(IDL.Text),
+    'email' : IDL.Text,
     'specialty' : IDL.Text,
     'isVerified' : IDL.Bool,
     'licenseNumber' : IDL.Text,
@@ -178,7 +207,7 @@ export const idlFactory = ({ IDL }) => {
     'overallScore' : IDL.Nat,
     'timestamp' : Time,
   });
-  const UserProfile = IDL.Record({ 'name' : IDL.Text });
+  const UserProfile = IDL.Record({ 'name' : IDL.Text, 'email' : IDL.Text });
   const BookingStatus = IDL.Variant({
     'pending' : IDL.Null,
     'completed' : IDL.Null,
@@ -199,6 +228,10 @@ export const idlFactory = ({ IDL }) => {
     'slotId' : IDL.Nat,
     'dentistId' : IDL.Principal,
   });
+  const DentistWithPrincipal = IDL.Record({
+    'principal' : IDL.Principal,
+    'profile' : DentistProfile,
+  });
   const AvailabilitySlot = IDL.Record({
     'dateTimeLabel' : IDL.Text,
     'slotId' : IDL.Nat,
@@ -209,6 +242,15 @@ export const idlFactory = ({ IDL }) => {
     'text' : IDL.Text,
     'author' : IDL.Principal,
     'timestamp' : Time,
+  });
+  const Testimonial = IDL.Record({
+    'testimonialId' : IDL.Nat,
+    'name' : IDL.Text,
+    'role' : IDL.Text,
+    'quote' : IDL.Text,
+    'author' : IDL.Principal,
+    'timestamp' : Time,
+    'rating' : IDL.Nat,
   });
   
   return IDL.Service({
@@ -227,6 +269,11 @@ export const idlFactory = ({ IDL }) => {
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getDentistBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
+    'getDentistByEmail' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(DentistWithPrincipal)],
+        ['query'],
+      ),
     'getDentistLanguages' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(IDL.Vec(IDL.Text))],
@@ -244,6 +291,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getFeedbackList' : IDL.Func([], [IDL.Vec(FeedbackEntry)], ['query']),
     'getPatientBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
+    'getTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
     'getUnreadMessageCount' : IDL.Func([], [IDL.Nat], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
@@ -266,6 +314,11 @@ export const idlFactory = ({ IDL }) => {
     'sendMessage' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Nat], []),
     'submitFeedback' : IDL.Func([IDL.Text], [], []),
     'submitScan' : IDL.Func([ScanResult], [], []),
+    'submitTestimonial' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
+        [IDL.Nat],
+        [],
+      ),
     'updateDentistProfile' : IDL.Func([DentistProfile], [], []),
   });
 };
