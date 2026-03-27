@@ -98,6 +98,16 @@ actor {
     timestamp : Time.Time;
   };
 
+  public type Testimonial = {
+    testimonialId : Nat;
+    author : Principal;
+    name : Text;
+    role : Text;
+    quote : Text;
+    rating : Nat;
+    timestamp : Time.Time;
+  };
+
   // ===================== STATE ==============================
 
   let accessControlState = AccessControl.initState();
@@ -110,6 +120,7 @@ actor {
   let availabilitySlots = Map.empty<Nat, AvailabilitySlot>();
   let bookings = Map.empty<Nat, Booking>();
   let messages = Map.empty<Nat, Message>();
+  let testimonials = Map.empty<Nat, Testimonial>();
   let visitors = Map.empty<Principal, Bool>();
 
   var feedbackCount : Nat = 0;
@@ -117,6 +128,7 @@ actor {
   var nextSlotId : Nat = 1;
   var nextBookingId : Nat = 1;
   var nextMessageId : Nat = 1;
+  var nextTestimonialId : Nat = 1;
 
   // ===================== TOOLS ==============================
 
@@ -569,5 +581,32 @@ actor {
     };
     count;
   };
-};
 
+  // ==================== TESTIMONIALS ========================
+
+  public shared ({ caller }) func submitTestimonial(name : Text, role : Text, quote : Text, rating : Nat) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only signed-in users can submit testimonials");
+    };
+    if (name.size() == 0 or quote.size() == 0) {
+      Runtime.trap("Name and review text are required");
+    };
+    let clampedRating = if (rating < 1) 1 else if (rating > 5) 5 else rating;
+    let t : Testimonial = {
+      testimonialId = nextTestimonialId;
+      author = caller;
+      name;
+      role;
+      quote;
+      rating = clampedRating;
+      timestamp = Time.now();
+    };
+    testimonials.add(nextTestimonialId, t);
+    nextTestimonialId += 1;
+    t.testimonialId;
+  };
+
+  public query func getTestimonials() : async [Testimonial] {
+    testimonials.values().toArray();
+  };
+};

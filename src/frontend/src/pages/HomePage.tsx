@@ -1,14 +1,16 @@
 import LogoCircle from "@/components/LogoCircle";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useActor } from "@/hooks/useActor";
 import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Activity,
-  Bell,
   Brain,
   CalendarCheck,
   Camera,
+  Check,
   ChevronRight,
   History,
   Lock,
@@ -17,13 +19,17 @@ import {
   MapPin,
   QrCode,
   ScanLine,
+  Send,
   Shield,
+  Star,
   Stethoscope,
   User,
+  X,
   Zap,
 } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const FEATURES = [
   {
@@ -90,11 +96,105 @@ const WHY_DANTANOVA = [
   },
 ];
 
+const STATIC_TESTIMONIALS = [
+  {
+    quote:
+      "Caught a cavity early before it became expensive. DantaNova saved me from a root canal!",
+    name: "Priya M.",
+    role: "Frequent Traveler",
+    rating: 5,
+  },
+  {
+    quote:
+      "Found an emergency dentist in 10 minutes while abroad. This app is a lifesaver.",
+    name: "James K.",
+    role: "Digital Nomad",
+    rating: 5,
+  },
+  {
+    quote:
+      "The 3D model made it so clear which teeth needed attention. Easy to understand.",
+    name: "Aisha R.",
+    role: "Student",
+    rating: 5,
+  },
+];
+
+const STORAGE_KEY = "dantanova_testimonials";
+
+interface UserTestimonial {
+  id: string;
+  name: string;
+  role: string;
+  quote: string;
+  rating: number;
+  timestamp: number;
+}
+
+function loadStoredTestimonials(): UserTestimonial[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as UserTestimonial[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveTestimonial(t: UserTestimonial) {
+  const existing = loadStoredTestimonials();
+  existing.unshift(t);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+}
+
+function StarPicker({
+  value,
+  onChange,
+}: { value: number; onChange: (v: number) => void }) {
+  const [hovered, setHovered] = useState(0);
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <button
+          key={n}
+          type="button"
+          onClick={() => onChange(n)}
+          onMouseEnter={() => setHovered(n)}
+          onMouseLeave={() => setHovered(0)}
+          className="transition-transform hover:scale-110 focus:outline-none"
+          aria-label="rate"
+          data-ocid="testimonial.toggle"
+        >
+          <Star
+            className="w-7 h-7 transition-colors duration-150"
+            style={{
+              color:
+                n <= (hovered || value)
+                  ? "oklch(0.88 0.18 85)"
+                  : "oklch(0.35 0.03 70)",
+              fill:
+                n <= (hovered || value) ? "oklch(0.88 0.18 85)" : "transparent",
+            }}
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function HomePage() {
   const navigate = useNavigate();
   const { identity, login, clear } = useInternetIdentity();
   const { actor } = useActor();
   const [unreadCount, setUnreadCount] = useState(0);
+
+  const [userTestimonials, setUserTestimonials] = useState<UserTestimonial[]>(
+    loadStoredTestimonials,
+  );
+  const [formName, setFormName] = useState("");
+  const [formRole, setFormRole] = useState("");
+  const [formRating, setFormRating] = useState(5);
+  const [formQuote, setFormQuote] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!actor || !identity) return;
@@ -112,57 +212,60 @@ export default function HomePage() {
     }
   };
 
+  const handleSubmitTestimonial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formName.trim() || !formQuote.trim()) {
+      toast.error("Please fill in your name and review.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const newEntry: UserTestimonial = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        name: formName.trim(),
+        role: formRole.trim() || "DantaNova User",
+        quote: formQuote.trim(),
+        rating: formRating,
+        timestamp: Date.now(),
+      };
+      saveTestimonial(newEntry);
+      setUserTestimonials(loadStoredTestimonials());
+      setFormName("");
+      setFormRole("");
+      setFormRating(5);
+      setFormQuote("");
+      toast.success("Thank you for your review!");
+    } catch {
+      toast.error("Could not submit review. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen grid-bg flex flex-col">
       {/* Header */}
       <header className="grid grid-cols-3 items-center px-6 py-4 md:px-10">
         <div className="flex justify-start" />
-
         <div className="flex items-center justify-center gap-3">
           <LogoCircle size="sm" />
           <span className="font-display font-bold text-xl tracking-tight">
             Danta<span className="text-gradient-cyan">Nova</span>
           </span>
         </div>
-
         <nav className="flex items-center justify-end gap-1 flex-wrap">
           <Button
             variant="ghost"
-            size="sm"
+            size="default"
             onClick={() => navigate({ to: "/qr" })}
             data-ocid="home.link"
-            className="text-muted-foreground hover:text-foreground rounded-full px-3"
+            className="text-muted-foreground hover:text-foreground rounded-full px-4 text-base font-semibold"
           >
-            <QrCode className="w-4 h-4 mr-1.5" />
-            QR
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate({ to: "/find-dentist" })}
-            data-ocid="home.find_dentist.link"
-            className="text-muted-foreground hover:text-yellow-400 rounded-full px-3"
-          >
-            <MapPin className="w-4 h-4 mr-1.5" />
-            Dentist
+            <QrCode className="w-5 h-5 mr-2" />
+            QR Code
           </Button>
           {identity ? (
             <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate({ to: "/my-bookings" })}
-                data-ocid="home.link"
-                className="text-muted-foreground hover:text-foreground rounded-full px-3 relative"
-              >
-                <CalendarCheck className="w-4 h-4 mr-1.5" />
-                Bookings
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-500 text-black text-[9px] font-bold flex items-center justify-center">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
-              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -297,7 +400,6 @@ export default function HomePage() {
             </Button>
           </motion.div>
 
-          {/* Dentist / bookings quick links */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -409,9 +511,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-            {/* Connector line (desktop only) */}
             <div className="hidden md:block absolute top-[52px] left-[calc(16.66%+24px)] right-[calc(16.66%+24px)] h-[2px] bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30" />
-
             {HOW_IT_WORKS.map((step, i) => (
               <motion.div
                 key={step.step}
@@ -421,7 +521,6 @@ export default function HomePage() {
                 transition={{ delay: i * 0.15, duration: 0.5 }}
                 className="glass-card rounded-3xl p-6 flex flex-col items-center text-center relative"
               >
-                {/* Step number circle */}
                 <div
                   className="w-14 h-14 rounded-full flex items-center justify-center mb-4 font-display font-bold text-lg relative z-10"
                   style={{
@@ -613,6 +712,415 @@ export default function HomePage() {
                 </motion.div>
               ))}
             </div>
+          </div>
+        </motion.section>
+
+        {/* ── Testimonials Section ── */}
+        <motion.section
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7 }}
+          className="mt-24 w-full max-w-5xl"
+          data-ocid="testimonials.section"
+        >
+          <div className="text-center mb-10">
+            <h2 className="font-display text-3xl font-bold text-primary mb-2">
+              What Our Users Say
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Real stories from DantaNova users
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {STATIC_TESTIMONIALS.map((t, idx) => (
+              <motion.div
+                key={t.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6, delay: idx * 0.12 }}
+                className="glass-card rounded-3xl p-6 flex flex-col gap-4"
+                style={{
+                  border: "1px solid oklch(0.75 0.18 85 / 0.35)",
+                  boxShadow: "0 0 18px oklch(0.75 0.18 85 / 0.08)",
+                }}
+                data-ocid={`testimonials.item.${idx + 1}`}
+              >
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <Star
+                      key={n}
+                      className="w-4 h-4"
+                      style={{
+                        color:
+                          n <= t.rating
+                            ? "oklch(0.88 0.18 85)"
+                            : "oklch(0.35 0.03 70)",
+                        fill:
+                          n <= t.rating ? "oklch(0.88 0.18 85)" : "transparent",
+                      }}
+                    />
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed italic">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div className="mt-auto">
+                  <p className="font-semibold text-sm text-foreground">
+                    {t.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{t.role}</p>
+                </div>
+              </motion.div>
+            ))}
+
+            <AnimatePresence>
+              {userTestimonials.map((t, idx) => (
+                <motion.div
+                  key={t.id}
+                  initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.92 }}
+                  transition={{ duration: 0.45, delay: idx * 0.05 }}
+                  className="glass-card rounded-3xl p-6 flex flex-col gap-4"
+                  style={{
+                    border: "1px solid oklch(0.75 0.18 85 / 0.45)",
+                    boxShadow:
+                      "0 0 22px oklch(0.75 0.18 85 / 0.12), inset 0 1px 0 oklch(0.75 0.18 85 / 0.06)",
+                  }}
+                  data-ocid={`testimonials.item.${STATIC_TESTIMONIALS.length + idx + 1}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <Star
+                          key={n}
+                          className="w-4 h-4"
+                          style={{
+                            color:
+                              n <= t.rating
+                                ? "oklch(0.88 0.18 85)"
+                                : "oklch(0.35 0.03 70)",
+                            fill:
+                              n <= t.rating
+                                ? "oklch(0.88 0.18 85)"
+                                : "transparent",
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <span
+                      className="text-[10px] font-medium px-2 py-0.5 rounded-full"
+                      style={{
+                        background: "oklch(0.72 0.15 85 / 0.15)",
+                        color: "oklch(0.82 0.14 85)",
+                        border: "1px solid oklch(0.72 0.15 85 / 0.3)",
+                      }}
+                    >
+                      Verified User
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed italic flex-1">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  <div className="mt-auto">
+                    <p className="font-semibold text-sm text-foreground">
+                      {t.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{t.role}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {/* ── Share Your Experience Form ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.65, delay: 0.1 }}
+            className="mt-10 glass-card rounded-3xl p-8 md:p-10"
+            style={{
+              border: "1.5px solid oklch(0.72 0.15 85 / 0.3)",
+              boxShadow:
+                "0 0 40px oklch(0.72 0.15 85 / 0.08), inset 0 1px 0 oklch(0.72 0.15 85 / 0.07)",
+            }}
+            data-ocid="testimonials.panel"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{
+                  background: "oklch(0.20 0.08 85 / 0.7)",
+                  border: "1.5px solid oklch(0.72 0.15 85 / 0.5)",
+                  boxShadow: "0 0 16px oklch(0.72 0.15 85 / 0.25)",
+                }}
+              >
+                <Star
+                  className="w-5 h-5"
+                  style={{ color: "oklch(0.88 0.18 85)" }}
+                />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-lg text-foreground">
+                  Share Your Experience
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Help others by leaving an honest review
+                </p>
+              </div>
+            </div>
+
+            {identity ? (
+              <form onSubmit={handleSubmitTestimonial} className="space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="review-name"
+                      className="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                    >
+                      Your Name
+                    </label>
+                    <Input
+                      id="review-name"
+                      value={formName}
+                      onChange={(e) => setFormName(e.target.value)}
+                      placeholder="e.g. Sarah T."
+                      className="rounded-full bg-background/50 border-border/50 focus:border-primary/60 placeholder:text-muted-foreground/50"
+                      data-ocid="testimonial.input"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="review-role"
+                      className="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                    >
+                      Your Role / Title
+                    </label>
+                    <Input
+                      id="review-role"
+                      value={formRole}
+                      onChange={(e) => setFormRole(e.target.value)}
+                      placeholder="e.g. Frequent Traveler, Student"
+                      className="rounded-full bg-background/50 border-border/50 focus:border-primary/60 placeholder:text-muted-foreground/50"
+                      data-ocid="testimonial.input"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Rating
+                  </p>
+                  <StarPicker value={formRating} onChange={setFormRating} />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="review-quote"
+                    className="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
+                    Your Review
+                  </label>
+                  <Textarea
+                    id="review-quote"
+                    value={formQuote}
+                    onChange={(e) => setFormQuote(e.target.value)}
+                    placeholder="Tell us about your experience with DantaNova..."
+                    rows={4}
+                    className="rounded-2xl bg-background/50 border-border/50 focus:border-primary/60 placeholder:text-muted-foreground/50 resize-none"
+                    data-ocid="testimonial.textarea"
+                    required
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{
+                      background: isSubmitting
+                        ? "oklch(0.55 0.12 85)"
+                        : "linear-gradient(135deg, oklch(0.82 0.18 85), oklch(0.68 0.16 80))",
+                      color: "oklch(0.06 0.01 60)",
+                      boxShadow: isSubmitting
+                        ? "none"
+                        : "0 4px 20px oklch(0.72 0.15 85 / 0.45)",
+                    }}
+                    data-ocid="testimonial.submit_button"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                        Submitting…
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Submit Review
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center gap-5 py-8 text-center"
+                data-ocid="testimonial.error_state"
+              >
+                <div
+                  className="w-16 h-16 rounded-full flex items-center justify-center"
+                  style={{
+                    background: "oklch(0.15 0.05 85 / 0.6)",
+                    border: "1.5px solid oklch(0.72 0.15 85 / 0.35)",
+                  }}
+                >
+                  <User
+                    className="w-7 h-7"
+                    style={{ color: "oklch(0.78 0.14 85)" }}
+                  />
+                </div>
+                <div>
+                  <p className="font-display font-semibold text-base text-foreground mb-1">
+                    Sign in to leave a review
+                  </p>
+                  <p className="text-sm text-muted-foreground max-w-xs">
+                    Join DantaNova and share your experience to help others
+                    discover better dental health.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => login()}
+                  className="flex items-center gap-2 px-7 py-3 rounded-full font-semibold text-sm transition-all duration-200"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, oklch(0.82 0.18 85), oklch(0.68 0.16 80))",
+                    color: "oklch(0.06 0.01 60)",
+                    boxShadow: "0 4px 20px oklch(0.72 0.15 85 / 0.4)",
+                  }}
+                  data-ocid="testimonial.primary_button"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Sign In to Review
+                </button>
+              </motion.div>
+            )}
+          </motion.div>
+        </motion.section>
+
+        {/* Before/After Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7 }}
+          className="mt-24 w-full max-w-4xl"
+        >
+          <div className="text-center mb-10">
+            <h2 className="font-display text-3xl font-bold text-primary mb-2">
+              See the Difference
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              DantaNova catches what&apos;s invisible to the naked eye
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6 }}
+              className="glass-card rounded-3xl p-7"
+              style={{
+                border: "1px solid oklch(0.5 0.18 20 / 0.5)",
+                boxShadow: "0 0 24px oklch(0.5 0.18 20 / 0.12)",
+              }}
+            >
+              <div className="flex items-center gap-2 mb-5">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ background: "oklch(0.4 0.18 20 / 0.3)" }}
+                >
+                  <X
+                    className="w-4 h-4"
+                    style={{ color: "oklch(0.65 0.2 20)" }}
+                  />
+                </div>
+                <h3
+                  className="font-display font-bold text-lg"
+                  style={{ color: "oklch(0.65 0.2 20)" }}
+                >
+                  WITHOUT DantaNova
+                </h3>
+              </div>
+              <ul className="flex flex-col gap-3">
+                {[
+                  "Miss cavities until they hurt",
+                  "Expensive emergency visits",
+                  "No early warning system",
+                  "Wasted dental visits",
+                ].map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-3 text-sm text-muted-foreground"
+                  >
+                    <X
+                      className="w-4 h-4 mt-0.5 shrink-0"
+                      style={{ color: "oklch(0.65 0.2 20)" }}
+                    />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="glass-card rounded-3xl p-7"
+              style={{
+                border: "1px solid oklch(0.75 0.18 85 / 0.55)",
+                boxShadow: "0 0 28px oklch(0.75 0.18 85 / 0.15)",
+              }}
+            >
+              <div className="flex items-center gap-2 mb-5">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ background: "oklch(0.75 0.18 85 / 0.2)" }}
+                >
+                  <Check className="w-4 h-4 text-primary" />
+                </div>
+                <h3 className="font-display font-bold text-lg text-primary">
+                  WITH DantaNova
+                </h3>
+              </div>
+              <ul className="flex flex-col gap-3">
+                {[
+                  "Catch issues in seconds from home",
+                  "Save thousands in treatment costs",
+                  "3D visualization of every tooth",
+                  "Connect with dentists instantly",
+                ].map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-3 text-sm text-muted-foreground"
+                  >
+                    <Check className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
           </div>
         </motion.section>
 
