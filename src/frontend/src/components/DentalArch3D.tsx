@@ -10,10 +10,16 @@ const STATUS_COLOR: Record<string, string> = {
   cavity: "#dc2626",
 };
 
+const STATUS_GLOW: Record<string, string> = {
+  healthy: "#22c55e",
+  risk: "#facc15",
+  cavity: "#f87171",
+};
+
 const STATUS_EMISSIVE: Record<string, string> = {
-  healthy: "#052e16",
-  risk: "#451a03",
-  cavity: "#450a0a",
+  healthy: "#0a2e14",
+  risk: "#2a1800",
+  cavity: "#2e0a0a",
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -107,8 +113,8 @@ function ToothMesh({
   const idx = isUpper ? toothNum - 1 : toothNum - 17;
   const { position, rotationY } = getToothTransform(toothNum);
   const [w, h, d] = getToothSize(idx);
-  const color = STATUS_COLOR[tooth.status] ?? "#16a34a";
-  const emissive = STATUS_EMISSIVE[tooth.status] ?? "#052e16";
+  const glowColor = STATUS_GLOW[tooth.status] ?? "#22c55e";
+  const statusEmissive = STATUS_EMISSIVE[tooth.status] ?? "#0a2e14";
   const isActive = isSelected || isHovered;
 
   const labelOffset: [number, number, number] = [
@@ -119,11 +125,20 @@ function ToothMesh({
 
   return (
     <group>
+      {/* Per-tooth status glow light */}
+      <pointLight
+        position={[position[0], position[1], position[2] + 0.3]}
+        intensity={isActive ? 1.2 : 0.45}
+        color={glowColor}
+        distance={1.2}
+        decay={2}
+      />
+
       <RoundedBox
         ref={meshRef}
         args={[w, h, d]}
-        radius={0.045}
-        smoothness={4}
+        radius={0.05}
+        smoothness={6}
         position={position}
         rotation={[0, rotationY, 0]}
         onClick={(e) => {
@@ -137,11 +152,12 @@ function ToothMesh({
         onPointerOut={() => onHover(null)}
       >
         <meshStandardMaterial
-          color={color}
-          emissive={isActive ? color : emissive}
-          emissiveIntensity={isActive ? 0.55 : 0.08}
-          roughness={0.28}
-          metalness={0.15}
+          color="#f5f0e8"
+          emissive={isActive ? glowColor : statusEmissive}
+          emissiveIntensity={isActive ? 0.35 : 0.06}
+          roughness={0.15}
+          metalness={0.05}
+          envMapIntensity={1.2}
         />
       </RoundedBox>
 
@@ -259,6 +275,45 @@ function ToothMesh({
   );
 }
 
+const GUM_INDICES = [
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+] as const;
+
+/** Curved gum/jaw base for upper or lower arch */
+function JawBase({ isUpper }: { isUpper: boolean }) {
+  const y = isUpper ? 0.28 : -0.28;
+
+  return (
+    <group>
+      {GUM_INDICES.map((idx) => {
+        const t = idx / 15;
+        const rx = 2.55;
+        const rz = 1.85;
+        const angle = Math.PI * (1 - t);
+        const x = rx * Math.cos(angle);
+        const z = rz * Math.sin(angle);
+        const rotY = -(Math.PI / 2 - angle);
+        return (
+          <mesh
+            key={`gum-seg-${idx}`}
+            position={[x, y, z]}
+            rotation={[0, rotY, 0]}
+          >
+            <boxGeometry args={[0.34, 0.22, 0.28]} />
+            <meshStandardMaterial
+              color="#7b2d2d"
+              roughness={0.75}
+              metalness={0.0}
+              emissive="#3a0d0d"
+              emissiveIntensity={0.15}
+            />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
 interface DentalArch3DProps {
   teeth: ToothRecord[];
 }
@@ -278,15 +333,37 @@ export default function DentalArch3D({ teeth }: DentalArch3DProps) {
         gl={{ antialias: true, alpha: false }}
         style={{ background: "#0a0800" }}
       >
-        <ambientLight intensity={0.5} />
+        {/* Ambient base */}
+        <ambientLight intensity={0.3} />
+
+        {/* Warm key light (gold) */}
         <directionalLight
           position={[4, 8, 5]}
-          intensity={1.2}
+          intensity={1.6}
           color="#ffe8a0"
+          castShadow
         />
-        {/* Gold accent lights */}
-        <pointLight position={[0, 4, 3]} intensity={0.8} color="#c9900a" />
-        <pointLight position={[0, -3, 2]} intensity={0.35} color="#a07000" />
+
+        {/* Cool fill light (blueish) */}
+        <directionalLight
+          position={[-5, 3, 2]}
+          intensity={0.5}
+          color="#a8d8ff"
+        />
+
+        {/* Strong rim light from behind */}
+        <directionalLight
+          position={[0, -2, -6]}
+          intensity={0.8}
+          color="#ffffff"
+        />
+
+        {/* Warm under-glow */}
+        <pointLight position={[0, -3, 2]} intensity={0.4} color="#a07000" />
+
+        {/* Jaw gum bases */}
+        <JawBase isUpper />
+        <JawBase isUpper={false} />
 
         {teeth.map((tooth, i) => (
           <ToothMesh

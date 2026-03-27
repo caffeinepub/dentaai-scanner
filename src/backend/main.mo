@@ -5,14 +5,14 @@ import Time "mo:core/Time";
 import Order "mo:core/Order";
 import Int "mo:core/Int";
 import Nat "mo:core/Nat";
-import Migration "migration";
+
 import Text "mo:core/Text";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
-(with migration = Migration.run)
+
 actor {
   // ===================== TYPES ==============================
   type ToothStatus = {

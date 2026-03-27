@@ -8,8 +8,10 @@ import {
   Bell,
   Brain,
   CalendarCheck,
+  Camera,
   ChevronRight,
   History,
+  Lock,
   LogIn,
   LogOut,
   MapPin,
@@ -18,6 +20,7 @@ import {
   Shield,
   Stethoscope,
   User,
+  Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
@@ -49,6 +52,42 @@ const stats = [
   { value: "32", label: "Teeth Analyzed" },
   { value: "6", label: "Conditions Detected" },
   { value: "~30s", label: "Scan Time" },
+];
+
+const HOW_IT_WORKS = [
+  {
+    step: "01",
+    icon: Camera,
+    title: "Open Camera",
+    desc: "Point your phone camera at your teeth. No special equipment needed — just good lighting.",
+  },
+  {
+    step: "02",
+    icon: Brain,
+    title: "AI Analyzes",
+    desc: "Our neural network scans each of your 32 teeth individually, identifying subtle signs of decay.",
+  },
+  {
+    step: "03",
+    icon: Zap,
+    title: "Get Results",
+    desc: "Receive a full 3D color-coded arch report in seconds with actionable recommendations.",
+  },
+];
+
+const WHY_DANTANOVA = [
+  {
+    icon: Stethoscope,
+    text: "No dentist visit needed for initial screening — scan from anywhere, anytime.",
+  },
+  {
+    icon: Activity,
+    text: "Early detection saves thousands in treatment costs by catching issues before they escalate.",
+  },
+  {
+    icon: Lock,
+    text: "Secure and private — your scan data is encrypted and stored on the blockchain, not sold.",
+  },
 ];
 
 export default function HomePage() {
@@ -169,12 +208,12 @@ export default function HomePage() {
       </header>
 
       {/* Hero */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12 md:py-20">
+      <main className="flex-1 flex flex-col items-center px-6 py-12 md:py-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="flex flex-col items-center text-center max-w-2xl"
+          className="flex flex-col items-center text-center max-w-2xl w-full"
         >
           <div className="relative mb-6">
             <div className="absolute inset-[-20px] rounded-full border border-primary/10" />
@@ -348,6 +387,178 @@ export default function HomePage() {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* How It Works */}
+        <motion.section
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7 }}
+          className="mt-28 max-w-5xl w-full"
+        >
+          <div className="text-center mb-12">
+            <p className="text-primary text-sm font-semibold uppercase tracking-[0.2em] mb-2">
+              Simple Process
+            </p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold">
+              How It Works
+            </h2>
+            <p className="text-muted-foreground mt-3 max-w-md mx-auto">
+              From camera to diagnosis in three effortless steps.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            {/* Connector line (desktop only) */}
+            <div className="hidden md:block absolute top-[52px] left-[calc(16.66%+24px)] right-[calc(16.66%+24px)] h-[2px] bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30" />
+
+            {HOW_IT_WORKS.map((step, i) => (
+              <motion.div
+                key={step.step}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.5 }}
+                className="glass-card rounded-3xl p-6 flex flex-col items-center text-center relative"
+              >
+                {/* Step number circle */}
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center mb-4 font-display font-bold text-lg relative z-10"
+                  style={{
+                    background: "oklch(0.22 0.08 85 / 0.9)",
+                    border: "2px solid oklch(0.72 0.15 85 / 0.6)",
+                    boxShadow: "0 0 20px oklch(0.72 0.15 85 / 0.3)",
+                    color: "oklch(0.88 0.18 85)",
+                  }}
+                >
+                  {step.step}
+                </div>
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center mb-3"
+                  style={{ background: "oklch(0.18 0.05 85 / 0.6)" }}
+                >
+                  <step.icon className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-display font-bold text-lg mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {step.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* Why Choose DantaNova */}
+        <motion.section
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7 }}
+          className="mt-24 max-w-5xl w-full"
+        >
+          <div className="text-center mb-10">
+            <p className="text-primary text-sm font-semibold uppercase tracking-[0.2em] mb-2">
+              Our Advantage
+            </p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold">
+              Why Choose DantaNova?
+            </h2>
+          </div>
+
+          <div
+            className="rounded-3xl p-8 md:p-10"
+            style={{
+              background:
+                "linear-gradient(135deg, oklch(0.13 0.04 85 / 0.95), oklch(0.10 0.02 85 / 0.95))",
+              border: "1px solid oklch(0.72 0.15 85 / 0.2)",
+              boxShadow:
+                "0 0 40px oklch(0.72 0.15 85 / 0.08), inset 0 1px 0 oklch(0.72 0.15 85 / 0.1)",
+              backdropFilter: "blur(20px)",
+            }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {WHY_DANTANOVA.map((item, i) => (
+                <motion.div
+                  key={item.icon.displayName ?? String(i)}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15, duration: 0.5 }}
+                  className="flex flex-col items-center md:items-start gap-4 text-center md:text-left"
+                >
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: "oklch(0.20 0.08 85 / 0.8)",
+                      border: "1.5px solid oklch(0.72 0.15 85 / 0.4)",
+                      boxShadow: "0 0 16px oklch(0.72 0.15 85 / 0.2)",
+                    }}
+                  >
+                    <item.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {item.text}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+
+        {/* CTA Banner */}
+        <motion.section
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7 }}
+          className="mt-24 mb-8 max-w-3xl w-full text-center"
+        >
+          <div
+            className="rounded-3xl py-14 px-8"
+            style={{
+              background:
+                "linear-gradient(135deg, oklch(0.15 0.06 85 / 0.9), oklch(0.11 0.03 85 / 0.95))",
+              border: "1px solid oklch(0.72 0.15 85 / 0.3)",
+              boxShadow:
+                "0 0 60px oklch(0.72 0.15 85 / 0.12), inset 0 1px 0 oklch(0.72 0.15 85 / 0.15)",
+            }}
+          >
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.6 }}
+              className="font-display text-3xl md:text-5xl font-bold mb-3"
+              style={{
+                background:
+                  "linear-gradient(90deg, oklch(0.88 0.18 85), oklch(0.78 0.14 75), oklch(0.88 0.18 85))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Early detection.
+              <br />
+              Healthier smiles.
+            </motion.h2>
+            <p className="text-muted-foreground mb-8 max-w-sm mx-auto">
+              Join thousands who caught dental issues early — and saved their
+              smiles.
+            </p>
+            <Button
+              size="lg"
+              className="text-base px-10 py-6 font-semibold glow-primary rounded-full"
+              onClick={handleStartScan}
+              data-ocid="home.cta.primary_button"
+            >
+              <ScanLine className="w-5 h-5 mr-2" />
+              {identity ? "Start Dental Scan" : "Sign In to Scan"}
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+        </motion.section>
       </main>
 
       <footer className="py-6 text-center text-xs text-muted-foreground border-t border-border/30">
