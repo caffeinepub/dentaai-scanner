@@ -450,6 +450,115 @@ export default function HomePage() {
           </div>
         </motion.section>
 
+        {/* Book a Dentist Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.7 }}
+          className="mt-28 max-w-5xl w-full"
+        >
+          <div className="text-center mb-14">
+            <p className="text-primary text-sm font-semibold uppercase tracking-[0.2em] mb-2">
+              Dental Care Network
+            </p>
+            <h2
+              className="font-display text-4xl md:text-6xl font-bold bg-clip-text text-transparent mb-4"
+              style={{
+                backgroundImage:
+                  "linear-gradient(135deg, oklch(0.88 0.18 85), oklch(0.72 0.15 85), oklch(0.95 0.12 85))",
+              }}
+            >
+              Book a Dentist
+            </h2>
+            <p className="text-muted-foreground mt-3 max-w-lg mx-auto text-lg">
+              Emergency dental care, real bookings — all in one place.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: CalendarCheck,
+                title: "Book an Appointment",
+                desc: "Enter a dentist's booking code to see real availability and confirm your appointment instantly.",
+                cta: "Book Now",
+                route: "/book",
+                delay: 0,
+              },
+              {
+                icon: MapPin,
+                title: "Find Emergency Dentist",
+                desc: "Browse verified local dentists available for urgent care, filter by urgency level.",
+                cta: "Find Dentist",
+                route: "/find-dentist",
+                delay: 0.15,
+              },
+              {
+                icon: Stethoscope,
+                title: "Register as Dentist",
+                desc: "Join DantaNova as a verified dentist — set your availability and start receiving patient bookings.",
+                cta: "Register",
+                route: "/dentist-register",
+                delay: 0.3,
+              },
+            ].map((card) => (
+              <motion.div
+                key={card.route}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: card.delay, duration: 0.55 }}
+                whileHover={{ scale: 1.04 }}
+                onClick={() => navigate({ to: card.route })}
+                className="glass-card rounded-3xl p-8 flex flex-col items-center text-center cursor-pointer"
+                style={{
+                  border: "1.5px solid oklch(0.72 0.15 85 / 0.45)",
+                  boxShadow:
+                    "0 0 32px oklch(0.72 0.15 85 / 0.12), inset 0 1px 0 oklch(0.72 0.15 85 / 0.08)",
+                  background:
+                    "linear-gradient(145deg, oklch(0.12 0.04 85 / 0.85), oklch(0.08 0.02 85 / 0.95))",
+                }}
+              >
+                <div
+                  className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
+                  style={{
+                    background: "oklch(0.18 0.06 85 / 0.7)",
+                    border: "2px solid oklch(0.72 0.15 85 / 0.6)",
+                    boxShadow: "0 0 28px oklch(0.72 0.15 85 / 0.35)",
+                  }}
+                >
+                  <card.icon
+                    className="w-10 h-10"
+                    style={{ color: "oklch(0.88 0.18 85)" }}
+                  />
+                </div>
+                <h3
+                  className="font-display font-bold text-2xl md:text-3xl mb-3"
+                  style={{ color: "oklch(0.92 0.14 85)" }}
+                >
+                  {card.title}
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-8 flex-1">
+                  {card.desc}
+                </p>
+                <button
+                  type="button"
+                  className="w-full py-3 rounded-full font-semibold text-base transition-all duration-200"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, oklch(0.72 0.15 85), oklch(0.62 0.14 85))",
+                    color: "oklch(0.08 0.02 85)",
+                    boxShadow: "0 4px 20px oklch(0.72 0.15 85 / 0.4)",
+                  }}
+                >
+                  {card.cta}
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
         {/* Why Choose DantaNova */}
         <motion.section
           initial={{ opacity: 0, y: 50 }}
