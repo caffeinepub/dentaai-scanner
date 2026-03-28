@@ -73,6 +73,30 @@ export interface Testimonial {
     timestamp: Time;
     rating: bigint;
 }
+export interface DentalPassport {
+    passportId: bigint;
+    patientId: Principal;
+    homeDentistId: Principal;
+    passportCode: string;
+    treatmentHistory: string;
+    currentConditions: string;
+    allergies: string;
+    preApprovedBudget: bigint;
+    notes: string;
+    isActive: boolean;
+    createdAt: Time;
+}
+export interface ReimbursementRequest {
+    requestId: bigint;
+    passportId: bigint;
+    travelingDentistId: Principal;
+    homeDentistId: Principal;
+    treatmentDescription: string;
+    amount: bigint;
+    platformFee: bigint;
+    status: ReimbursementStatus;
+    createdAt: Time;
+}
 export enum BookingStatus {
     pending = "pending",
     completed = "completed",
@@ -94,6 +118,11 @@ export enum UserRole {
     user = "user",
     guest = "guest"
 }
+export enum ReimbursementStatus {
+    pending = "pending",
+    approved = "approved",
+    declined = "declined"
+}
 export interface backendInterface {
     addAvailabilitySlot(dateTimeLabel: string): Promise<bigint>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
@@ -114,21 +143,30 @@ export interface backendInterface {
     getDentistProfile(dentist: Principal): Promise<DentistProfile | null>;
     getDentistSlots(dentistId: Principal): Promise<Array<AvailabilitySlot>>;
     getFeedbackList(): Promise<Array<FeedbackEntry>>;
+    getMyPassport(): Promise<DentalPassport | null>;
+    getMyReimbursementRequests(): Promise<Array<ReimbursementRequest>>;
+    getPassportByCode(code: string): Promise<DentalPassport | null>;
+    getPassportsIssuedByMe(): Promise<Array<DentalPassport>>;
     getPatientBookings(): Promise<Array<Booking>>;
+    getReimbursementRequestsForMe(): Promise<Array<ReimbursementRequest>>;
     getTestimonials(): Promise<Array<Testimonial>>;
     getUnreadMessageCount(): Promise<bigint>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getUserScanHistory(user: Principal): Promise<Array<ScanResult>>;
     getVisitorCount(): Promise<bigint>;
     isCallerAdmin(): Promise<boolean>;
+    issuePassport(patientEmail: string, treatmentHistory: string, currentConditions: string, allergies: string, preApprovedBudget: bigint, notes: string): Promise<{ ok: bigint } | { err: string }>;
     markPaymentPaid(bookingId: bigint): Promise<void>;
     markPaymentReleased(bookingId: bigint): Promise<void>;
     recordVisit(): Promise<void>;
     registerDentistProfile(profile: DentistProfile): Promise<void>;
     removeAvailabilitySlot(slotId: bigint): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    selfIssuePassport(treatmentHistory: string, currentConditions: string, allergies: string, preApprovedBudget: bigint, notes: string): Promise<{ ok: bigint } | { err: string }>;
     sendMessage(bookingId: bigint, text: string): Promise<bigint>;
+    settleReimbursement(requestId: bigint, approve: boolean): Promise<{ ok: boolean } | { err: string }>;
     submitFeedback(text: string): Promise<void>;
+    submitReimbursementRequest(passportCode: string, treatmentDescription: string, amount: bigint): Promise<{ ok: bigint } | { err: string }>;
     submitScan(scan: ScanResult): Promise<void>;
     submitTestimonial(name: string, role: string, quote: string, rating: bigint): Promise<bigint>;
     updateDentistProfile(profile: DentistProfile): Promise<void>;

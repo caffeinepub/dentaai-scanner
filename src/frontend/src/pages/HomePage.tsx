@@ -549,6 +549,113 @@ export default function HomePage() {
           </div>
         </motion.section>
 
+        {/* Dental Passport Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.7 }}
+          className="mt-28 max-w-5xl w-full"
+        >
+          <div className="text-center mb-12">
+            <p className="text-primary text-sm font-semibold uppercase tracking-[0.2em] mb-2">
+              Trust Network
+            </p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold">
+              Dental Passport
+            </h2>
+            <p className="font-display text-xl md:text-2xl text-primary mt-2 italic">
+              Travel Without Dental Worries
+            </p>
+            <p className="text-muted-foreground mt-4 max-w-lg mx-auto">
+              When you travel, your dentist travels with you. Your home dentist
+              vouches for you — payment settled dentist-to-dentist. Zero stress
+              for you.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            {[
+              {
+                icon: "🤝",
+                title: "Your Dentist Vouches For You",
+                desc: "Your home dentist issues a digital passport with your full records, conditions, and allergies — so any dentist can treat you with full context.",
+              },
+              {
+                icon: "💳",
+                title: "Zero Payment Stress",
+                desc: "No upfront payment required while traveling. The visiting dentist submits a reimbursement to your home dentist. You just receive care.",
+              },
+              {
+                icon: "🦷",
+                title: "Full Continuity of Care",
+                desc: "The traveling dentist sees your complete history, current conditions, and pre-approved treatment budget — just like your home dentist would.",
+              },
+            ].map((card, i) => (
+              <motion.div
+                key={card.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.5 }}
+                className="glass-card rounded-3xl p-6 flex flex-col items-center text-center gap-3"
+                style={{
+                  border: "1.5px solid oklch(0.72 0.15 85 / 0.5)",
+                  boxShadow: "0 0 30px oklch(0.72 0.15 85 / 0.08)",
+                }}
+              >
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-2xl"
+                  style={{
+                    background: "oklch(0.22 0.08 85 / 0.6)",
+                    border: "2px solid oklch(0.72 0.15 85 / 0.5)",
+                    boxShadow: "0 0 20px oklch(0.72 0.15 85 / 0.25)",
+                  }}
+                >
+                  {card.icon}
+                </div>
+                <h3 className="font-display font-bold text-base">
+                  {card.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {card.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link to="/passport">
+              <button
+                type="button"
+                className="flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm transition-all duration-200"
+                style={{
+                  background:
+                    "linear-gradient(135deg, oklch(0.82 0.18 85), oklch(0.68 0.16 80))",
+                  color: "oklch(0.06 0.01 60)",
+                  boxShadow: "0 4px 24px oklch(0.72 0.15 85 / 0.4)",
+                }}
+                data-ocid="home.passport.primary_button"
+              >
+                🛂 Get My Passport
+              </button>
+            </Link>
+            <Link to="/issue-passport">
+              <button
+                type="button"
+                className="flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm border transition-all duration-200 hover:bg-yellow-500/10"
+                style={{
+                  border: "1.5px solid oklch(0.72 0.15 85 / 0.6)",
+                  color: "oklch(0.88 0.18 85)",
+                }}
+                data-ocid="home.passport.secondary_button"
+              >
+                📋 Issue a Passport
+              </button>
+            </Link>
+          </div>
+        </motion.section>
+
         {/* Book a Dentist Section */}
         <motion.section
           initial={{ opacity: 0, y: 50 }}

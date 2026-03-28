@@ -11,9 +11,9 @@ import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+
 actor {
   // ===================== TYPES ==============================
   type ToothStatus = {
@@ -116,6 +116,38 @@ actor {
     principal : Principal;
   };
 
+  public type DentalPassport = {
+    passportId : Nat;
+    patientId : Principal;
+    homeDentistId : Principal;
+    passportCode : Text;
+    treatmentHistory : Text;
+    currentConditions : Text;
+    allergies : Text;
+    preApprovedBudget : Nat;
+    notes : Text;
+    isActive : Bool;
+    createdAt : Time.Time;
+  };
+
+  public type ReimbursementStatus = {
+    #pending;
+    #approved;
+    #declined;
+  };
+
+  public type ReimbursementRequest = {
+    requestId : Nat;
+    passportId : Nat;
+    travelingDentistId : Principal;
+    homeDentistId : Principal;
+    treatmentDescription : Text;
+    amount : Nat;
+    platformFee : Nat;
+    status : ReimbursementStatus;
+    createdAt : Time.Time;
+  };
+
   // ===================== STATE ==============================
 
   let accessControlState = AccessControl.initState();
@@ -131,6 +163,10 @@ actor {
   let testimonials = Map.empty<Nat, Testimonial>();
   let visitors = Map.empty<Principal, Bool>();
   let emailToDentistPrincipal = Map.empty<Text, Principal>();
+  let passports = Map.empty<Nat, DentalPassport>();
+  let reimbursementRequests = Map.empty<Nat, ReimbursementRequest>();
+  let patientPassportMap = Map.empty<Principal, Nat>();
+  let passportCodeMap = Map.empty<Text, Nat>();
 
   var feedbackCount : Nat = 0;
   var visitorCount : Nat = 0;
@@ -138,6 +174,8 @@ actor {
   var nextBookingId : Nat = 1;
   var nextMessageId : Nat = 1;
   var nextTestimonialId : Nat = 1;
+  var nextPassportId : Nat = 1;
+  var nextReimbursementId : Nat = 1;
 
   // ===================== TOOLS ==============================
 
@@ -640,4 +678,174 @@ actor {
   public query func getTestimonials() : async [Testimonial] {
     testimonials.values().toArray();
   };
+
+  // ==================== DENTAL PASSPORT =====================
+
+  public shared ({ caller }) func issuePassport(
+    patientEmail : Text,
+    treatmentHistory : Text,
+    currentConditions : Text,
+    allergies : Text,
+    preApprovedBudget : Nat,
+    notes : Text
+  ) : async { #ok : Nat; #err : Text } {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      return #err("Unauthorized");
+    };
+    switch (dentistProfiles.get(caller)) {
+      case (null) { return #err("You must be a registered dentist to issue passports") };
+      case (_) {};
+    };
+    var patientPrincipalOpt : ?Principal = null;
+    for ((p, profile) in userProfiles.entries()) {
+      if (profile.email == patientEmail) {
+        patientPrincipalOpt := ?p;
+      };
+    };
+    switch (patientPrincipalOpt) {
+      case (null) { return #err("No user found with that email address") };
+      case (?patientPrincipal) {
+        let code = "DP-" # nextPassportId.toText();
+        let passport : DentalPassport = {
+          passportId = nextPassportId;
+          patientId = patientPrincipal;
+          homeDentistId = caller;
+          passportCode = code;
+          treatmentHistory;
+          currentConditions;
+          allergies;
+          preApprovedBudget;
+          notes;
+          isActive = true;
+          createdAt = Time.now();
+        };
+        passports.add(nextPassportId, passport);
+        patientPassportMap.add(patientPrincipal, nextPassportId);
+        passportCodeMap.add(code, nextPassportId);
+        let id = nextPassportId;
+        nextPassportId += 1;
+        #ok(id)
+      };
+    };
+  };
+
+  public shared ({ caller }) func selfIssuePassport(
+    treatmentHistory : Text,
+    currentConditions : Text,
+    allergies : Text,
+    preApprovedBudget : Nat,
+    notes : Text
+  ) : async { #ok : Nat; #err : Text } {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      return #err("Unauthorized");
+    };
+    switch (patientPassportMap.get(caller)) {
+      case (?_) { return #err("You already have a passport") };
+      case (null) {};
+    };
+    let code = "DP-" # nextPassportId.toText();
+    let passport : DentalPassport = {
+      passportId = nextPassportId;
+      patientId = caller;
+      homeDentistId = caller;
+      passportCode = code;
+      treatmentHistory;
+      currentConditions;
+      allergies;
+      preApprovedBudget;
+      notes;
+      isActive = true;
+      createdAt = Time.now();
+    };
+    passports.add(nextPassportId, passport);
+    patientPassportMap.add(caller, nextPassportId);
+    passportCodeMap.add(code, nextPassportId);
+    let id = nextPassportId;
+    nextPassportId += 1;
+    #ok(id)
+  };
+
+  public query ({ caller }) func getMyPassport() : async ?DentalPassport {
+    switch (patientPassportMap.get(caller)) {
+      case (null) { null };
+      case (?pid) { passports.get(pid) };
+    };
+  };
+
+  public query func getPassportByCode(code : Text) : async ?DentalPassport {
+    switch (passportCodeMap.get(code)) {
+      case (null) { null };
+      case (?pid) { passports.get(pid) };
+    };
+  };
+
+  public query ({ caller }) func getPassportsIssuedByMe() : async [DentalPassport] {
+    passports.values().filter(func(p) { p.homeDentistId == caller }).toArray();
+  };
+
+  public shared ({ caller }) func submitReimbursementRequest(
+    passportCode : Text,
+    treatmentDescription : Text,
+    amount : Nat
+  ) : async { #ok : Nat; #err : Text } {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      return #err("Unauthorized");
+    };
+    switch (dentistProfiles.get(caller)) {
+      case (null) { return #err("You must be a registered dentist to submit reimbursement requests") };
+      case (_) {};
+    };
+    switch (passportCodeMap.get(passportCode)) {
+      case (null) { return #err("Passport code not found") };
+      case (?pid) {
+        switch (passports.get(pid)) {
+          case (null) { return #err("Passport not found") };
+          case (?passport) {
+            if (not passport.isActive) { return #err("Passport is not active") };
+            let platformFee = amount * 8 / 100;
+            let req : ReimbursementRequest = {
+              requestId = nextReimbursementId;
+              passportId = pid;
+              travelingDentistId = caller;
+              homeDentistId = passport.homeDentistId;
+              treatmentDescription;
+              amount;
+              platformFee;
+              status = #pending;
+              createdAt = Time.now();
+            };
+            reimbursementRequests.add(nextReimbursementId, req);
+            let id = nextReimbursementId;
+            nextReimbursementId += 1;
+            #ok(id)
+          };
+        };
+      };
+    };
+  };
+
+  public query ({ caller }) func getReimbursementRequestsForMe() : async [ReimbursementRequest] {
+    reimbursementRequests.values().filter(func(r) { r.homeDentistId == caller }).toArray();
+  };
+
+  public query ({ caller }) func getMyReimbursementRequests() : async [ReimbursementRequest] {
+    reimbursementRequests.values().filter(func(r) { r.travelingDentistId == caller }).toArray();
+  };
+
+  public shared ({ caller }) func settleReimbursement(requestId : Nat, approve : Bool) : async { #ok : Bool; #err : Text } {
+    switch (reimbursementRequests.get(requestId)) {
+      case (null) { return #err("Request not found") };
+      case (?req) {
+        if (req.homeDentistId != caller) { return #err("Unauthorized: Only home dentist can settle this request") };
+        if (req.status != #pending) { return #err("Request already settled") };
+        let updatedReq : ReimbursementRequest = {
+          req with
+          status = if (approve) { #approved } else { #declined };
+        };
+        reimbursementRequests.add(requestId, updatedReq);
+        #ok(true)
+      };
+    };
+  };
+
 };

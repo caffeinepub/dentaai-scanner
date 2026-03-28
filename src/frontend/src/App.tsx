@@ -9,8 +9,11 @@ import DentistRegisterPage from "@/pages/DentistRegisterPage";
 import FindDentistPage from "@/pages/FindDentistPage";
 import HistoryPage from "@/pages/HistoryPage";
 import HomePage from "@/pages/HomePage";
+import IssuePassportPage from "@/pages/IssuePassportPage";
 import MessagesPage from "@/pages/MessagesPage";
 import MyBookingsPage from "@/pages/MyBookingsPage";
+import PassportLookupPage from "@/pages/PassportLookupPage";
+import PassportPage from "@/pages/PassportPage";
 import PrivacyPage from "@/pages/PrivacyPage";
 import ProfilePage from "@/pages/ProfilePage";
 import QRCodePage from "@/pages/QRCodePage";
@@ -126,6 +129,24 @@ const messagesRoute = createRoute({
   component: MessagesPage,
 });
 
+const passportRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/passport",
+  component: PassportPage,
+});
+
+const issuePassportRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/issue-passport",
+  component: IssuePassportPage,
+});
+
+const passportLookupRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/passport-lookup",
+  component: PassportLookupPage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   scanRoute,
@@ -142,6 +163,9 @@ const routeTree = rootRoute.addChildren([
   bookRoute,
   myBookingsRoute,
   messagesRoute,
+  passportRoute,
+  issuePassportRoute,
+  passportLookupRoute,
 ]);
 
 const router = createRouter({ routeTree });

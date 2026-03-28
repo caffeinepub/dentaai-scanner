@@ -9,6 +9,7 @@ import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
+  BookOpen,
   CalendarPlus,
   Check,
   CheckCircle,
@@ -23,6 +24,18 @@ import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+interface ReimbursementRequest {
+  requestId: bigint;
+  passportId: bigint;
+  travelingDentistId: any;
+  homeDentistId: any;
+  treatmentDescription: string;
+  amount: bigint;
+  platformFee: bigint;
+  status: any;
+  createdAt: bigint;
+}
+
 function statusColor(status: string) {
   const s = typeof status === "string" ? status : Object.keys(status as any)[0];
   if (s === "confirmed")
@@ -30,6 +43,14 @@ function statusColor(status: string) {
   if (s === "declined") return "bg-red-500/15 text-red-400 border-red-500/30";
   if (s === "completed")
     return "bg-blue-500/15 text-blue-400 border-blue-500/30";
+  return "bg-yellow-500/15 text-yellow-400 border-yellow-500/30";
+}
+
+function reimbStatusColor(status: any): string {
+  const s = typeof status === "string" ? status : Object.keys(status)[0];
+  if (s === "approved")
+    return "bg-green-500/15 text-green-400 border-green-500/30";
+  if (s === "declined") return "bg-red-500/15 text-red-400 border-red-500/30";
   return "bg-yellow-500/15 text-yellow-400 border-yellow-500/30";
 }
 
@@ -46,6 +67,9 @@ export default function DentistDashboardPage() {
   const [profile, setProfile] = useState<DentistProfile | null>(null);
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [reimbRequests, setReimbRequests] = useState<ReimbursementRequest[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [newSlot, setNewSlot] = useState("");
   const [addingSlot, setAddingSlot] = useState(false);
@@ -56,15 +80,20 @@ export default function DentistDashboardPage() {
       return;
     }
     const p = identity.getPrincipal();
+    const a = actor as any;
     Promise.all([
       actor.getDentistProfile(p),
       actor.getDentistSlots(p),
       actor.getDentistBookings(),
+      a
+        .getReimbursementRequestsForMe()
+        .catch(() => [] as ReimbursementRequest[]),
     ])
-      .then(([prof, sl, bk]) => {
+      .then(([prof, sl, bk, reimb]) => {
         setProfile(prof);
-        setSlots(sl);
-        setBookings(bk);
+        setSlots(sl as AvailabilitySlot[]);
+        setBookings(bk as Booking[]);
+        setReimbRequests(reimb as ReimbursementRequest[]);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -145,6 +174,29 @@ export default function DentistDashboardPage() {
       toast.success("Marked as completed");
     } catch {
       toast.error("Failed to complete");
+    }
+  };
+
+  const settleReimbursement = async (requestId: bigint, approve: boolean) => {
+    if (!actor) return;
+    try {
+      const a = actor as any;
+      const result = await a.settleReimbursement(requestId, approve);
+      if ("ok" in result) {
+        const newStatus = approve ? "approved" : "declined";
+        setReimbRequests((prev) =>
+          prev.map((r) =>
+            r.requestId === requestId ? { ...r, status: newStatus } : r,
+          ),
+        );
+        toast.success(
+          approve ? "Reimbursement approved!" : "Reimbursement declined",
+        );
+      } else {
+        toast.error(result.err ?? "Failed to settle");
+      }
+    } catch {
+      toast.error("Failed to settle reimbursement");
     }
   };
 
@@ -230,14 +282,29 @@ export default function DentistDashboardPage() {
               className="w-full rounded-full bg-muted/30 mb-6"
               data-ocid="dentist_dashboard.tab"
             >
-              <TabsTrigger value="profile" className="rounded-full flex-1">
+              <TabsTrigger
+                value="profile"
+                className="rounded-full flex-1 text-xs"
+              >
                 Profile
               </TabsTrigger>
-              <TabsTrigger value="availability" className="rounded-full flex-1">
+              <TabsTrigger
+                value="availability"
+                className="rounded-full flex-1 text-xs"
+              >
                 Availability
               </TabsTrigger>
-              <TabsTrigger value="bookings" className="rounded-full flex-1">
+              <TabsTrigger
+                value="bookings"
+                className="rounded-full flex-1 text-xs"
+              >
                 Bookings
+              </TabsTrigger>
+              <TabsTrigger
+                value="passport"
+                className="rounded-full flex-1 text-xs"
+              >
+                Passport
               </TabsTrigger>
             </TabsList>
 
@@ -324,6 +391,33 @@ export default function DentistDashboardPage() {
                       data-ocid="dentist_dashboard.toggle"
                     >
                       <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Passport Quick Links */}
+                <div className="glass-card rounded-3xl p-5 flex flex-col gap-3">
+                  <p className="text-sm font-semibold text-yellow-400 mb-1">
+                    Dental Passport Tools
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      size="sm"
+                      className="rounded-full glow-primary text-xs"
+                      onClick={() => navigate({ to: "/issue-passport" })}
+                      data-ocid="dentist_dashboard.primary_button"
+                    >
+                      <BookOpen className="w-3.5 h-3.5 mr-1" />
+                      Issue a Passport
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full border-yellow-500/30 text-yellow-400 text-xs"
+                      onClick={() => navigate({ to: "/passport-lookup" })}
+                      data-ocid="dentist_dashboard.secondary_button"
+                    >
+                      Lookup Patient Passport
                     </Button>
                   </div>
                 </div>
@@ -512,6 +606,164 @@ export default function DentistDashboardPage() {
                             Chat
                           </Button>
                         </div>
+                      </motion.div>
+                    );
+                  })
+                )}
+              </motion.div>
+            </TabsContent>
+
+            {/* Passport Tab */}
+            <TabsContent value="passport">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col gap-4"
+              >
+                <div
+                  className="glass-card rounded-3xl p-4 flex items-start gap-3 mb-1"
+                  style={{
+                    border: "1px solid oklch(0.72 0.15 85 / 0.4)",
+                    background: "oklch(0.15 0.06 85 / 0.15)",
+                  }}
+                >
+                  <BookOpen className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Reimbursement requests from traveling dentists who treated
+                    your patients. Approve or decline each request — payment is
+                    settled minus the 8% platform fee.
+                  </p>
+                </div>
+
+                <div className="flex gap-2 mb-2">
+                  <Button
+                    size="sm"
+                    className="rounded-full glow-primary text-xs"
+                    onClick={() => navigate({ to: "/issue-passport" })}
+                    data-ocid="dentist_dashboard.primary_button"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 mr-1" />
+                    Issue Passport
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full border-yellow-500/30 text-yellow-400 text-xs"
+                    onClick={() => navigate({ to: "/passport-lookup" })}
+                    data-ocid="dentist_dashboard.secondary_button"
+                  >
+                    Lookup Patient
+                  </Button>
+                </div>
+
+                <h3 className="font-display font-semibold text-base">
+                  Incoming Reimbursement Requests
+                </h3>
+
+                {reimbRequests.length === 0 ? (
+                  <div
+                    className="glass-card rounded-3xl p-8 text-center"
+                    data-ocid="dentist_dashboard.empty_state"
+                  >
+                    <p className="text-sm text-muted-foreground">
+                      No reimbursement requests yet.
+                    </p>
+                  </div>
+                ) : (
+                  reimbRequests.map((req, i) => {
+                    const statusStr =
+                      typeof req.status === "string"
+                        ? req.status
+                        : Object.keys(req.status)[0];
+                    const netAmount =
+                      Number(req.amount) - Number(req.platformFee);
+                    return (
+                      <motion.div
+                        key={req.requestId.toString()}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.06 }}
+                        className="glass-card rounded-3xl p-4 flex flex-col gap-3"
+                        data-ocid={`dentist_dashboard.item.${i + 1}`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-muted-foreground">
+                              Request #{Number(req.requestId)}
+                            </p>
+                            <p className="text-sm font-medium line-clamp-2">
+                              {req.treatmentDescription}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Traveling dentist:{" "}
+                              {req.travelingDentistId.toString().slice(0, 14)}
+                              ...
+                            </p>
+                          </div>
+                          <span
+                            className={`text-xs px-2.5 py-1 rounded-full border font-semibold shrink-0 ${reimbStatusColor(req.status)}`}
+                          >
+                            {statusStr}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="glass-card rounded-xl p-2">
+                            <p className="text-xs text-muted-foreground">
+                              Amount
+                            </p>
+                            <p className="text-sm font-bold text-yellow-400">
+                              ${(Number(req.amount) / 100).toFixed(2)}
+                            </p>
+                          </div>
+                          <div className="glass-card rounded-xl p-2">
+                            <p className="text-xs text-muted-foreground">
+                              Platform Fee
+                            </p>
+                            <p className="text-sm font-bold text-muted-foreground">
+                              ${(Number(req.platformFee) / 100).toFixed(2)}
+                            </p>
+                          </div>
+                          <div className="glass-card rounded-xl p-2">
+                            <p className="text-xs text-muted-foreground">
+                              You Pay
+                            </p>
+                            <p
+                              className="text-sm font-bold"
+                              style={{ color: "oklch(0.75 0.18 145)" }}
+                            >
+                              ${(netAmount / 100).toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+
+                        {statusStr === "pending" && (
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              className="rounded-full bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30 text-xs px-3 flex-1"
+                              onClick={() =>
+                                settleReimbursement(req.requestId, true)
+                              }
+                              data-ocid="dentist_dashboard.confirm_button"
+                            >
+                              <Check className="w-3.5 h-3.5 mr-1" />
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="rounded-full text-red-400 hover:bg-red-500/10 text-xs px-3 flex-1"
+                              onClick={() =>
+                                settleReimbursement(req.requestId, false)
+                              }
+                              data-ocid="dentist_dashboard.cancel_button"
+                            >
+                              <X className="w-3.5 h-3.5 mr-1" />
+                              Decline
+                            </Button>
+                          </div>
+                        )}
                       </motion.div>
                     );
                   })
