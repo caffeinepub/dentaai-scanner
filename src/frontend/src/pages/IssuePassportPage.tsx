@@ -93,7 +93,7 @@ export default function IssuePassportPage() {
         notes.trim(),
       );
       if ("ok" in result) {
-        setIssuedCode(result.ok as string);
+        setIssuedCode(`DP-${result.ok.toString()}`);
         // Refresh list
         const updated = await a.getPassportsIssuedByMe();
         setIssuedPassports(updated);

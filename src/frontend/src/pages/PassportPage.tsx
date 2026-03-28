@@ -122,9 +122,11 @@ export default function PassportPage() {
     try {
       const a = actor as any;
       const result = await a.selfIssuePassport(
-        selfAllergies.trim(),
-        selfConditions.trim(),
-        selfNotes.trim(),
+        "", // treatmentHistory
+        selfConditions.trim(), // currentConditions
+        selfAllergies.trim(), // allergies
+        BigInt(0), // preApprovedBudget
+        selfNotes.trim(), // notes
       );
       if (result && "ok" in result) {
         toast.success("Your Dental Passport has been created!");
