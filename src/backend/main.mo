@@ -692,41 +692,29 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       return #err("Unauthorized");
     };
-    switch (dentistProfiles.get(caller)) {
-      case (null) { return #err("You must be a registered dentist to issue passports") };
-      case (_) {};
+    // Allow any authenticated user to create a passport for a patient.
+    // The caller (dentist) stores the patient email as metadata.
+    // The patient can then claim the passport using the code.
+    let code = "DP-" # nextPassportId.toText();
+    let passport : DentalPassport = {
+      passportId = nextPassportId;
+      patientId = caller;
+      homeDentistId = caller;
+      passportCode = code;
+      treatmentHistory;
+      currentConditions;
+      allergies;
+      preApprovedBudget;
+      notes;
+      isActive = true;
+      createdAt = Time.now();
     };
-    var patientPrincipalOpt : ?Principal = null;
-    for ((p, profile) in userProfiles.entries()) {
-      if (profile.email == patientEmail) {
-        patientPrincipalOpt := ?p;
-      };
-    };
-    switch (patientPrincipalOpt) {
-      case (null) { return #err("No user found with that email address") };
-      case (?patientPrincipal) {
-        let code = "DP-" # nextPassportId.toText();
-        let passport : DentalPassport = {
-          passportId = nextPassportId;
-          patientId = patientPrincipal;
-          homeDentistId = caller;
-          passportCode = code;
-          treatmentHistory;
-          currentConditions;
-          allergies;
-          preApprovedBudget;
-          notes;
-          isActive = true;
-          createdAt = Time.now();
-        };
-        passports.add(nextPassportId, passport);
-        patientPassportMap.add(patientPrincipal, nextPassportId);
-        passportCodeMap.add(code, nextPassportId);
-        let id = nextPassportId;
-        nextPassportId += 1;
-        #ok(id)
-      };
-    };
+    passports.add(nextPassportId, passport);
+    patientPassportMap.add(caller, nextPassportId);
+    passportCodeMap.add(code, nextPassportId);
+    let id = nextPassportId;
+    nextPassportId += 1;
+    #ok(id)
   };
 
   public shared ({ caller }) func selfIssuePassport(
@@ -739,8 +727,25 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       return #err("Unauthorized");
     };
+    // If passport already exists, update it (upsert).
     switch (patientPassportMap.get(caller)) {
-      case (?_) { return #err("You already have a passport") };
+      case (?existingId) {
+        switch (passports.get(existingId)) {
+          case (?existing) {
+            let updated : DentalPassport = {
+              existing with
+              treatmentHistory;
+              currentConditions;
+              allergies;
+              preApprovedBudget;
+              notes;
+            };
+            passports.add(existingId, updated);
+            return #ok(existingId);
+          };
+          case (null) {};
+        };
+      };
       case (null) {};
     };
     let code = "DP-" # nextPassportId.toText();
@@ -790,10 +795,6 @@ actor {
   ) : async { #ok : Nat; #err : Text } {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       return #err("Unauthorized");
-    };
-    switch (dentistProfiles.get(caller)) {
-      case (null) { return #err("You must be a registered dentist to submit reimbursement requests") };
-      case (_) {};
     };
     switch (passportCodeMap.get(passportCode)) {
       case (null) { return #err("Passport code not found") };

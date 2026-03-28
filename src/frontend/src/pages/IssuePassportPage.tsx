@@ -95,8 +95,12 @@ export default function IssuePassportPage() {
       if ("ok" in result) {
         setIssuedCode(`DP-${result.ok.toString()}`);
         // Refresh list
-        const updated = await a.getPassportsIssuedByMe();
-        setIssuedPassports(updated);
+        try {
+          const updated = await a.getPassportsIssuedByMe();
+          setIssuedPassports(updated);
+        } catch {
+          // ignore refresh errors
+        }
       } else {
         toast.error(result.err ?? "Failed to issue passport");
       }
@@ -149,7 +153,7 @@ export default function IssuePassportPage() {
           variant="ghost"
           size="icon"
           className="rounded-full h-9 w-9"
-          onClick={() => navigate({ to: "/dentist-dashboard" })}
+          onClick={() => navigate({ to: "/passport" })}
           data-ocid="issue_passport.secondary_button"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -160,7 +164,7 @@ export default function IssuePassportPage() {
             Issue Dental Passport
           </h1>
           <p className="text-xs text-muted-foreground">
-            Create a passport for your patient
+            Create a dental passport for a patient
           </p>
         </div>
         <Link to="/qr">
@@ -189,10 +193,10 @@ export default function IssuePassportPage() {
         >
           <ShieldCheck className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Issuing a Dental Passport allows your patient to travel and receive
-            care anywhere in the DantaNova network. You pre-approve a treatment
-            budget and the traveling dentist will bill you directly — minus the
-            platform fee.
+            A Dental Passport lets a patient receive trusted care anywhere in
+            the DantaNova network. Enter the patient's email, pre-approve a
+            budget, and the patient can share the generated code with any
+            dentist they visit while traveling.
           </p>
         </motion.div>
 
@@ -259,6 +263,16 @@ export default function IssuePassportPage() {
                     <Copy className="w-5 h-5" />
                   </Button>
                 </div>
+                <p className="text-xs text-muted-foreground text-center mt-3 leading-relaxed">
+                  Share this code with your patient. They can use it at the{" "}
+                  <Link
+                    to="/passport-lookup"
+                    className="text-yellow-400 underline"
+                  >
+                    Passport Lookup
+                  </Link>{" "}
+                  page when visiting a dentist away from home.
+                </p>
               </div>
 
               <Button
@@ -448,8 +462,8 @@ export default function IssuePassportPage() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs text-muted-foreground">Patient</p>
-                      <p className="text-sm font-mono truncate">
-                        {p.patientId.toString().slice(0, 20)}...
+                      <p className="text-sm truncate">
+                        {p.notes ? p.notes.split("\n")[0] : "Patient"}
                       </p>
                       <code
                         className="text-xs font-mono text-yellow-400"

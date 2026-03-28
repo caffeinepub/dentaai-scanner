@@ -12,6 +12,7 @@ import {
   CheckCircle,
   DollarSign,
   Loader2,
+  Mail,
   QrCode,
   Search,
   Send,
@@ -124,11 +125,15 @@ export default function PassportLookupPage() {
         BigInt(amountCents),
       );
       if ("ok" in result) {
-        toast.success("Billing request submitted to home dentist!");
+        toast.success("Billing request submitted!");
         setTreatmentDesc("");
         setAmountInput("");
-        const updated = await a.getMyReimbursementRequests();
-        setMyRequests(updated);
+        try {
+          const updated = await a.getMyReimbursementRequests();
+          setMyRequests(updated);
+        } catch {
+          // ignore refresh errors
+        }
       } else {
         toast.error(result.err ?? "Failed to submit request");
       }
@@ -164,7 +169,7 @@ export default function PassportLookupPage() {
           variant="ghost"
           size="icon"
           className="rounded-full h-9 w-9"
-          onClick={() => navigate({ to: "/dentist-dashboard" })}
+          onClick={() => navigate({ to: "/passport" })}
           data-ocid="passport_lookup.secondary_button"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -173,7 +178,7 @@ export default function PassportLookupPage() {
         <div className="flex-1">
           <h1 className="font-display font-bold text-lg">Passport Lookup</h1>
           <p className="text-xs text-muted-foreground">
-            Look up a traveling patient's passport
+            Look up a patient passport by code
           </p>
         </div>
         <Link to="/qr">
@@ -204,7 +209,7 @@ export default function PassportLookupPage() {
             Look Up Patient by Passport Code
           </h2>
           <p className="text-xs text-muted-foreground mb-1">
-            Ask the patient for their unique passport code.
+            Ask the patient for their unique passport code (e.g. DP-123).
           </p>
           <p className="text-xs mb-4" style={{ color: "oklch(0.72 0.15 85)" }}>
             💡 Tip: Ask the patient to open <strong>My Dental Passport</strong>{" "}
@@ -213,7 +218,7 @@ export default function PassportLookupPage() {
           <div className="flex gap-2">
             <Input
               className="rounded-2xl bg-background/60 border-border/40 flex-1 font-mono tracking-widest text-yellow-300"
-              placeholder="e.g. DENTA-XXXXXX"
+              placeholder="e.g. DP-123"
               value={codeInput}
               onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
               onKeyDown={(e) => e.key === "Enter" && lookupPassport()}

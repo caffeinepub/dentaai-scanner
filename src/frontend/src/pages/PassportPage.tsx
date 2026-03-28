@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Copy,
   Loader2,
+  Mail,
   QrCode,
   Share2,
   Stethoscope,
@@ -129,6 +130,7 @@ export default function PassportPage() {
         selfNotes.trim(), // notes
       );
       if (result && "ok" in result) {
+        // Backend now upserts — ok means created or updated
         toast.success("Your Dental Passport has been created!");
         setShowSelfForm(false);
         setSelfAllergies("");
