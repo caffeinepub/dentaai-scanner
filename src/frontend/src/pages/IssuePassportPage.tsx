@@ -315,7 +315,7 @@ export default function IssuePassportPage() {
 
               <div className="flex flex-col gap-2">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                  Pre-Approved Budget (USD) *
+                  Pre-Approved Budget (INR) *
                 </span>
                 <Input
                   className="rounded-2xl bg-background/60 border-border/40"
@@ -487,7 +487,7 @@ export default function IssuePassportPage() {
                       {p.isActive ? "Active" : "Inactive"}
                     </Badge>
                     <span className="text-xs text-yellow-400 font-bold">
-                      ${(Number(p.preApprovedBudget) / 100).toFixed(2)}
+                      ₹{(Number(p.preApprovedBudget) / 100).toFixed(2)}
                     </span>
                   </div>
                 </motion.div>

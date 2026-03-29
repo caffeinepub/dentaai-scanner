@@ -713,7 +713,7 @@ export default function DentistDashboardPage() {
                               Amount
                             </p>
                             <p className="text-sm font-bold text-yellow-400">
-                              ${(Number(req.amount) / 100).toFixed(2)}
+                              ₹{(Number(req.amount) / 100).toFixed(2)}
                             </p>
                           </div>
                           <div className="glass-card rounded-xl p-2">
@@ -721,7 +721,7 @@ export default function DentistDashboardPage() {
                               Platform Fee
                             </p>
                             <p className="text-sm font-bold text-muted-foreground">
-                              ${(Number(req.platformFee) / 100).toFixed(2)}
+                              ₹{(Number(req.platformFee) / 100).toFixed(2)}
                             </p>
                           </div>
                           <div className="glass-card rounded-xl p-2">
@@ -732,7 +732,7 @@ export default function DentistDashboardPage() {
                               className="text-sm font-bold"
                               style={{ color: "oklch(0.75 0.18 145)" }}
                             >
-                              ${(netAmount / 100).toFixed(2)}
+                              ₹{(netAmount / 100).toFixed(2)}
                             </p>
                           </div>
                         </div>

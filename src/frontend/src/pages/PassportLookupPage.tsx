@@ -327,7 +327,7 @@ export default function PassportLookupPage() {
                     Pre-Approved Budget
                   </p>
                   <p className="text-xl font-bold text-yellow-400">
-                    ${(Number(passport.preApprovedBudget) / 100).toFixed(2)}
+                    ₹{(Number(passport.preApprovedBudget) / 100).toFixed(2)}
                   </p>
                 </div>
                 {passport.currentConditions && (
@@ -391,7 +391,7 @@ export default function PassportLookupPage() {
               </div>
               <div className="flex flex-col gap-2">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                  Amount (USD) *
+                  Amount (INR) *
                 </span>
                 <Input
                   className="rounded-2xl bg-background/60 border-border/40"
@@ -408,7 +408,7 @@ export default function PassportLookupPage() {
                   <p className="text-xs text-muted-foreground">
                     You receive:{" "}
                     <span className="text-yellow-400 font-semibold">
-                      ${(Number.parseFloat(amountInput) * 0.92).toFixed(2)}
+                      ₹{(Number.parseFloat(amountInput) * 0.92).toFixed(2)}
                     </span>{" "}
                     after 8% platform fee
                   </p>
@@ -489,10 +489,10 @@ export default function PassportLookupPage() {
                       </span>
                       <div className="text-right">
                         <span className="text-yellow-400 font-bold text-sm">
-                          ${(Number(req.amount) / 100).toFixed(2)}
+                          ₹{(Number(req.amount) / 100).toFixed(2)}
                         </span>
                         <span className="text-xs text-muted-foreground ml-1">
-                          (-{(Number(req.platformFee) / 100).toFixed(2)} fee)
+                          (-₹{(Number(req.platformFee) / 100).toFixed(2)} fee)
                         </span>
                       </div>
                     </div>

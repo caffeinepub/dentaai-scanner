@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ScanProvider } from "@/context/ScanContext";
 import AnalysisPage from "@/pages/AnalysisPage";
 import BookByCodePage from "@/pages/BookByCodePage";
+import DemoPage from "@/pages/DemoPage";
 import DentistDashboardPage from "@/pages/DentistDashboardPage";
 import DentistRegisterPage from "@/pages/DentistRegisterPage";
 import FindDentistPage from "@/pages/FindDentistPage";
@@ -147,6 +148,12 @@ const passportLookupRoute = createRoute({
   component: PassportLookupPage,
 });
 
+const demoRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/demo",
+  component: DemoPage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   scanRoute,
@@ -166,6 +173,7 @@ const routeTree = rootRoute.addChildren([
   passportRoute,
   issuePassportRoute,
   passportLookupRoute,
+  demoRoute,
 ]);
 
 const router = createRouter({ routeTree });

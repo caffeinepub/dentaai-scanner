@@ -376,6 +376,15 @@ export default function HomePage() {
               {identity ? "Start Dental Scan" : "Sign In to Scan"}
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-base px-8 py-6 rounded-full border-yellow-500/60 text-yellow-400 hover:bg-yellow-500/10"
+              onClick={() => navigate({ to: "/demo" })}
+              data-ocid="home.demo.button"
+            >
+              ▶ Watch Demo
+            </Button>
             {identity ? (
               <Button
                 size="lg"

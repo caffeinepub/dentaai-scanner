@@ -516,7 +516,7 @@ export default function PassportPage() {
                     Pre-Approved Budget
                   </p>
                   <p className="text-lg font-bold text-yellow-400">
-                    ${(Number(passport.preApprovedBudget) / 100).toFixed(2)}
+                    ₹{(Number(passport.preApprovedBudget) / 100).toFixed(2)}
                   </p>
                 </div>
                 {passport.notes && (
@@ -575,7 +575,7 @@ export default function PassportPage() {
                             Amount
                           </span>
                           <span className="text-yellow-400 font-bold">
-                            ${(Number(req.amount) / 100).toFixed(2)}
+                            ₹{(Number(req.amount) / 100).toFixed(2)}
                           </span>
                         </div>
                       </motion.div>
