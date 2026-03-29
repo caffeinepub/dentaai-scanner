@@ -86,6 +86,31 @@ export interface UserProfile { 'name' : string, 'email' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface DentalPassport {
+  'passportId': bigint,
+  'patientId': Principal,
+  'homeDentistId': Principal,
+  'passportCode': string,
+  'treatmentHistory': string,
+  'currentConditions': string,
+  'allergies': string,
+  'preApprovedBudget': bigint,
+  'notes': string,
+  'isActive': boolean,
+  'createdAt': Time,
+}
+export type ReimbursementStatus = { 'pending': null } | { 'approved': null } | { 'declined': null };
+export interface ReimbursementRequest {
+  'requestId': bigint,
+  'passportId': bigint,
+  'travelingDentistId': Principal,
+  'homeDentistId': Principal,
+  'treatmentDescription': string,
+  'amount': bigint,
+  'platformFee': bigint,
+  'status': ReimbursementStatus,
+  'createdAt': Time,
+}
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addAvailabilitySlot' : ActorMethod<[string], bigint>,
@@ -125,6 +150,15 @@ export interface _SERVICE {
   'submitScan' : ActorMethod<[ScanResult], undefined>,
   'submitTestimonial' : ActorMethod<[string, string, string, bigint], bigint>,
   'updateDentistProfile' : ActorMethod<[DentistProfile], undefined>,
+  'getMyPassport': ActorMethod<[], [] | [DentalPassport]>,
+  'getPassportByCode': ActorMethod<[string], [] | [DentalPassport]>,
+  'getPassportsIssuedByMe': ActorMethod<[], Array<DentalPassport>>,
+  'issuePassport': ActorMethod<[string, string, string, string, bigint, string], { 'ok': bigint } | { 'err': string }>,
+  'selfIssuePassport': ActorMethod<[string, string, string, bigint, string], { 'ok': bigint } | { 'err': string }>,
+  'submitReimbursementRequest': ActorMethod<[string, string, bigint], { 'ok': bigint } | { 'err': string }>,
+  'getReimbursementRequestsForMe': ActorMethod<[], Array<ReimbursementRequest>>,
+  'getMyReimbursementRequests': ActorMethod<[], Array<ReimbursementRequest>>,
+  'settleReimbursement': ActorMethod<[bigint, boolean], { 'ok': boolean } | { 'err': string }>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

@@ -176,6 +176,32 @@ export enum UserRole {
     user = "user",
     guest = "guest"
 }
+export interface DentalPassport {
+  passportId: bigint;
+  patientId: Principal;
+  homeDentistId: Principal;
+  passportCode: string;
+  treatmentHistory: string;
+  currentConditions: string;
+  allergies: string;
+  preApprovedBudget: bigint;
+  notes: string;
+  isActive: boolean;
+  createdAt: bigint;
+}
+export type ReimbursementStatus = { pending: null } | { approved: null } | { declined: null };
+export interface ReimbursementRequest {
+  requestId: bigint;
+  passportId: bigint;
+  travelingDentistId: Principal;
+  homeDentistId: Principal;
+  treatmentDescription: string;
+  amount: bigint;
+  platformFee: bigint;
+  status: ReimbursementStatus;
+  createdAt: bigint;
+}
+
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     addAvailabilitySlot(dateTimeLabel: string): Promise<bigint>;
@@ -750,6 +776,35 @@ export class Backend implements backendInterface {
             const result = await this.actor.updateDentistProfile(arg0);
             return result;
         }
+    }
+    async getMyPassport(): Promise<DentalPassport | null> {
+        const result = await this.actor.getMyPassport();
+        return result.length === 0 ? null : result[0] as DentalPassport;
+    }
+    async getPassportByCode(code: string): Promise<DentalPassport | null> {
+        const result = await this.actor.getPassportByCode(code);
+        return result.length === 0 ? null : result[0] as DentalPassport;
+    }
+    async getPassportsIssuedByMe(): Promise<Array<DentalPassport>> {
+        return this.actor.getPassportsIssuedByMe() as any;
+    }
+    async issuePassport(patientEmail: string, treatmentHistory: string, currentConditions: string, allergies: string, preApprovedBudget: bigint, notes: string): Promise<{ ok: bigint } | { err: string }> {
+        return this.actor.issuePassport(patientEmail, treatmentHistory, currentConditions, allergies, preApprovedBudget, notes) as any;
+    }
+    async selfIssuePassport(treatmentHistory: string, currentConditions: string, allergies: string, preApprovedBudget: bigint, notes: string): Promise<{ ok: bigint } | { err: string }> {
+        return this.actor.selfIssuePassport(treatmentHistory, currentConditions, allergies, preApprovedBudget, notes) as any;
+    }
+    async submitReimbursementRequest(passportCode: string, treatmentDescription: string, amount: bigint): Promise<{ ok: bigint } | { err: string }> {
+        return this.actor.submitReimbursementRequest(passportCode, treatmentDescription, amount) as any;
+    }
+    async getReimbursementRequestsForMe(): Promise<Array<ReimbursementRequest>> {
+        return this.actor.getReimbursementRequestsForMe() as any;
+    }
+    async getMyReimbursementRequests(): Promise<Array<ReimbursementRequest>> {
+        return this.actor.getMyReimbursementRequests() as any;
+    }
+    async settleReimbursement(requestId: bigint, approve: boolean): Promise<{ ok: boolean } | { err: string }> {
+        return this.actor.settleReimbursement(requestId, approve) as any;
     }
 }
 function from_candid_BookingStatus_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _BookingStatus): BookingStatus {

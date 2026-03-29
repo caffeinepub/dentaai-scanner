@@ -96,6 +96,36 @@ export const Testimonial = IDL.Record({
   'rating' : IDL.Nat,
 });
 
+export const ReimbursementStatus = IDL.Variant({
+  'pending': IDL.Null,
+  'approved': IDL.Null,
+  'declined': IDL.Null,
+});
+export const DentalPassport = IDL.Record({
+  'passportId': IDL.Nat,
+  'patientId': IDL.Principal,
+  'homeDentistId': IDL.Principal,
+  'passportCode': IDL.Text,
+  'treatmentHistory': IDL.Text,
+  'currentConditions': IDL.Text,
+  'allergies': IDL.Text,
+  'preApprovedBudget': IDL.Nat,
+  'notes': IDL.Text,
+  'isActive': IDL.Bool,
+  'createdAt': Time,
+});
+export const ReimbursementRequest = IDL.Record({
+  'requestId': IDL.Nat,
+  'passportId': IDL.Nat,
+  'travelingDentistId': IDL.Principal,
+  'homeDentistId': IDL.Principal,
+  'treatmentDescription': IDL.Text,
+  'amount': IDL.Nat,
+  'platformFee': IDL.Nat,
+  'status': ReimbursementStatus,
+  'createdAt': Time,
+});
+
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addAvailabilitySlot' : IDL.Func([IDL.Text], [IDL.Nat], []),
@@ -163,6 +193,15 @@ export const idlService = IDL.Service({
       [],
     ),
   'updateDentistProfile' : IDL.Func([DentistProfile], [], []),
+  'getMyPassport': IDL.Func([], [IDL.Opt(DentalPassport)], ['query']),
+  'getPassportByCode': IDL.Func([IDL.Text], [IDL.Opt(DentalPassport)], ['query']),
+  'getPassportsIssuedByMe': IDL.Func([], [IDL.Vec(DentalPassport)], ['query']),
+  'issuePassport': IDL.Func([IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Text], [IDL.Variant({'ok': IDL.Nat, 'err': IDL.Text})], []),
+  'selfIssuePassport': IDL.Func([IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Text], [IDL.Variant({'ok': IDL.Nat, 'err': IDL.Text})], []),
+  'submitReimbursementRequest': IDL.Func([IDL.Text, IDL.Text, IDL.Nat], [IDL.Variant({'ok': IDL.Nat, 'err': IDL.Text})], []),
+  'getReimbursementRequestsForMe': IDL.Func([], [IDL.Vec(ReimbursementRequest)], ['query']),
+  'getMyReimbursementRequests': IDL.Func([], [IDL.Vec(ReimbursementRequest)], ['query']),
+  'settleReimbursement': IDL.Func([IDL.Nat, IDL.Bool], [IDL.Variant({'ok': IDL.Bool, 'err': IDL.Text})], []),
 });
 
 export const idlInitArgs = [];
@@ -252,6 +291,35 @@ export const idlFactory = ({ IDL }) => {
     'timestamp' : Time,
     'rating' : IDL.Nat,
   });
+  const ReimbursementStatus = IDL.Variant({
+    'pending': IDL.Null,
+    'approved': IDL.Null,
+    'declined': IDL.Null,
+  });
+  const DentalPassport = IDL.Record({
+    'passportId': IDL.Nat,
+    'patientId': IDL.Principal,
+    'homeDentistId': IDL.Principal,
+    'passportCode': IDL.Text,
+    'treatmentHistory': IDL.Text,
+    'currentConditions': IDL.Text,
+    'allergies': IDL.Text,
+    'preApprovedBudget': IDL.Nat,
+    'notes': IDL.Text,
+    'isActive': IDL.Bool,
+    'createdAt': Time,
+  });
+  const ReimbursementRequest = IDL.Record({
+    'requestId': IDL.Nat,
+    'passportId': IDL.Nat,
+    'travelingDentistId': IDL.Principal,
+    'homeDentistId': IDL.Principal,
+    'treatmentDescription': IDL.Text,
+    'amount': IDL.Nat,
+    'platformFee': IDL.Nat,
+    'status': ReimbursementStatus,
+    'createdAt': Time,
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -320,6 +388,15 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'updateDentistProfile' : IDL.Func([DentistProfile], [], []),
+    'getMyPassport': IDL.Func([], [IDL.Opt(DentalPassport)], ['query']),
+    'getPassportByCode': IDL.Func([IDL.Text], [IDL.Opt(DentalPassport)], ['query']),
+    'getPassportsIssuedByMe': IDL.Func([], [IDL.Vec(DentalPassport)], ['query']),
+    'issuePassport': IDL.Func([IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Text], [IDL.Variant({'ok': IDL.Nat, 'err': IDL.Text})], []),
+    'selfIssuePassport': IDL.Func([IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Text], [IDL.Variant({'ok': IDL.Nat, 'err': IDL.Text})], []),
+    'submitReimbursementRequest': IDL.Func([IDL.Text, IDL.Text, IDL.Nat], [IDL.Variant({'ok': IDL.Nat, 'err': IDL.Text})], []),
+    'getReimbursementRequestsForMe': IDL.Func([], [IDL.Vec(ReimbursementRequest)], ['query']),
+    'getMyReimbursementRequests': IDL.Func([], [IDL.Vec(ReimbursementRequest)], ['query']),
+    'settleReimbursement': IDL.Func([IDL.Nat, IDL.Bool], [IDL.Variant({'ok': IDL.Bool, 'err': IDL.Text})], []),
   });
 };
 
