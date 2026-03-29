@@ -226,6 +226,14 @@ export default function QRCodePage() {
           </Link>
         </p>
         <p className="mt-1">Developed by Swanandi Manoj Vispute</p>
+        <p className="mt-1">
+          <a
+            href="mailto:dantanova@gmail.com"
+            className="text-yellow-400 hover:text-yellow-300"
+          >
+            dantanova@gmail.com
+          </a>
+        </p>
       </footer>
     </div>
   );

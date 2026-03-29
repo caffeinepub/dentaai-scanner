@@ -200,7 +200,13 @@ export default function MessagesPage() {
             Privacy
           </Link>
           {" · "}
-          Developed by Swanandi Manoj Vispute
+          Developed by Swanandi Manoj Vispute ·{" "}
+          <a
+            href="mailto:dantanova@gmail.com"
+            className="text-yellow-400 hover:text-yellow-300"
+          >
+            dantanova@gmail.com
+          </a>
         </p>
       </footer>
     </div>
