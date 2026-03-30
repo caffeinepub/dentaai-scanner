@@ -6,16 +6,14 @@ import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 const logoSrc = "/assets/uploads/file_00000000a88c720bbdf9639edb08e122-3-1.png";
+const APP_URL = "https://dentaai-scanner-n0h.caffeine.xyz";
 
 // Minimal QR code generator using canvas
-// Uses the QR code API via an img tag with a data URL fallback
 function useQRCode(value: string, size = 260) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    // Use a reliable QR code generation approach via canvas drawing
-    // We encode a simple URL-based QR image from the QuickChart API
     const url = `https://quickchart.io/qr?text=${encodeURIComponent(value)}&size=${size}&margin=1`;
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -40,8 +38,7 @@ function useQRCode(value: string, size = 260) {
 export default function QRCodePage() {
   const navigate = useNavigate();
   const { identity, login, clear } = useInternetIdentity();
-  const appUrl = window.location.href.split("/qr")[0];
-  const { canvasRef, imgSrc } = useQRCode(appUrl, 260);
+  const { canvasRef, imgSrc } = useQRCode(APP_URL, 260);
 
   const handleDownload = () => {
     const canvas = canvasRef.current;
@@ -55,9 +52,9 @@ export default function QRCodePage() {
 
   const handleShare = async () => {
     if (navigator.share) {
-      await navigator.share({ title: "DantaNova", url: appUrl });
+      await navigator.share({ title: "DantaNova", url: APP_URL });
     } else {
-      await navigator.clipboard.writeText(appUrl);
+      await navigator.clipboard.writeText(APP_URL);
     }
   };
 
@@ -176,17 +173,19 @@ export default function QRCodePage() {
               )}
             </div>
 
-            <p
-              className="mt-4 font-mono tracking-wide text-center whitespace-nowrap overflow-hidden"
+            <a
+              href={APP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 font-mono tracking-wide text-center hover:underline"
               style={{
                 color: "#c9a84c",
-                fontSize: "7px",
-                maxWidth: 280,
-                textOverflow: "ellipsis",
+                fontSize: "9px",
+                wordBreak: "break-all",
               }}
             >
-              {appUrl}
-            </p>
+              {APP_URL}
+            </a>
           </motion.div>
 
           <div className="flex gap-3 w-full max-w-xs mt-2">

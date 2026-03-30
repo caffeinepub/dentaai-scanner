@@ -319,6 +319,11 @@ export default function HomePage() {
           className="flex flex-col items-center text-center max-w-2xl w-full"
         >
           <div className="relative mb-6">
+            {/* Subtle radial glow behind logo */}
+            <div
+              className="absolute inset-[-40px] rounded-full blur-3xl pointer-events-none"
+              style={{ background: "oklch(0.78 0.16 80 / 0.08)" }}
+            />
             <div className="absolute inset-[-20px] rounded-full border border-primary/10" />
             <div className="absolute inset-[-10px] rounded-full border border-primary/15" />
             <LogoCircle size="xl" animate />
@@ -511,7 +516,7 @@ export default function HomePage() {
             <p className="text-primary text-sm font-semibold uppercase tracking-[0.2em] mb-2">
               Simple Process
             </p>
-            <h2 className="font-display text-4xl md:text-5xl font-bold">
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-gradient-gold">
               How It Works
             </h2>
             <p className="text-muted-foreground mt-3 max-w-md mx-auto">
@@ -570,7 +575,7 @@ export default function HomePage() {
             <p className="text-primary text-sm font-semibold uppercase tracking-[0.2em] mb-2">
               Trust Network
             </p>
-            <h2 className="font-display text-4xl md:text-5xl font-bold">
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-gradient-gold">
               Dental Passport
             </h2>
             <p className="font-display text-xl md:text-2xl text-primary mt-2 italic">
@@ -786,7 +791,7 @@ export default function HomePage() {
             <p className="text-primary text-sm font-semibold uppercase tracking-[0.2em] mb-2">
               Our Advantage
             </p>
-            <h2 className="font-display text-4xl md:text-5xl font-bold">
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-gradient-gold">
               Why Choose DantaNova?
             </h2>
           </div>
@@ -841,7 +846,7 @@ export default function HomePage() {
           data-ocid="testimonials.section"
         >
           <div className="text-center mb-10">
-            <h2 className="font-display text-3xl font-bold text-primary mb-2">
+            <h2 className="font-display text-3xl font-bold text-gradient-gold mb-2">
               What Our Users Say
             </h2>
             <p className="text-muted-foreground text-sm">
@@ -1141,7 +1146,7 @@ export default function HomePage() {
           className="mt-24 w-full max-w-4xl"
         >
           <div className="text-center mb-10">
-            <h2 className="font-display text-3xl font-bold text-primary mb-2">
+            <h2 className="font-display text-3xl font-bold text-gradient-gold mb-2">
               See the Difference
             </h2>
             <p className="text-muted-foreground text-sm">

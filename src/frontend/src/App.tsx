@@ -21,13 +21,18 @@ import QRCodePage from "@/pages/QRCodePage";
 import ResultsPage from "@/pages/ResultsPage";
 import ScanPage from "@/pages/ScanPage";
 import TermsPage from "@/pages/TermsPage";
+import UITestPage from "@/pages/UITestPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
+  Link,
+  Outlet,
   RouterProvider,
   createRootRoute,
   createRoute,
   createRouter,
+  useRouterState,
 } from "@tanstack/react-router";
+import { Bug } from "lucide-react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,7 +43,33 @@ const queryClient = new QueryClient({
   },
 });
 
-const rootRoute = createRootRoute();
+function RootLayout() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isDebugPage = pathname === "/ui-test";
+
+  return (
+    <>
+      <Outlet />
+      <FloatingFeedback />
+      <CookieNotice />
+      <Toaster />
+      {!isDebugPage && (
+        <Link
+          to="/ui-test"
+          className="fixed bottom-4 left-4 z-50 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border border-border/50 bg-card/90 backdrop-blur text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-all shadow-lg"
+          data-ocid="debug.open_modal_button"
+        >
+          <Bug className="w-3.5 h-3.5" />
+          Debug
+        </Link>
+      )}
+    </>
+  );
+}
+
+const rootRoute = createRootRoute({
+  component: RootLayout,
+});
 
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -154,6 +185,12 @@ const demoRoute = createRoute({
   component: DemoPage,
 });
 
+const uiTestRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/ui-test",
+  component: UITestPage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   scanRoute,
@@ -174,6 +211,7 @@ const routeTree = rootRoute.addChildren([
   issuePassportRoute,
   passportLookupRoute,
   demoRoute,
+  uiTestRoute,
 ]);
 
 const router = createRouter({ routeTree });
@@ -189,9 +227,6 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <ScanProvider>
         <RouterProvider router={router} />
-        <FloatingFeedback />
-        <CookieNotice />
-        <Toaster />
       </ScanProvider>
     </QueryClientProvider>
   );

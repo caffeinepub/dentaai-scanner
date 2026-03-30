@@ -100,10 +100,12 @@ body {
     background-clip: text;
   }
 
+  /* Upgraded glass card: richer border depth + inner top highlight */
   .glass-card {
     background: oklch(0.12 0.008 60 / 0.85);
     backdrop-filter: blur(12px);
-    border: 1px solid oklch(0.3 0.03 70 / 0.45);
+    border: 1px solid oklch(0.3 0.03 70 / 0.6);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.04);
   }
 
   .glow-primary {
