@@ -202,10 +202,10 @@ export default function MessagesPage() {
           {" · "}
           Developed by Swanandi Manoj Vispute ·{" "}
           <a
-            href="mailto:dantanova@gmail.com"
+            href="mailto:DANTANOVA.14@gmail.com"
             className="text-yellow-400 hover:text-yellow-300"
           >
-            dantanova@gmail.com
+            DANTANOVA.14@gmail.com
           </a>
         </p>
       </footer>

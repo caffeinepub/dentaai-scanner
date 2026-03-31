@@ -257,10 +257,10 @@ export default function HistoryPage() {
         <p className="mt-1">Developed by Swanandi Manoj Vispute</p>
         <p className="mt-1">
           <a
-            href="mailto:dantanova@gmail.com"
+            href="mailto:DANTANOVA.14@gmail.com"
             className="text-yellow-400 hover:text-yellow-300"
           >
-            dantanova@gmail.com
+            DANTANOVA.14@gmail.com
           </a>
         </p>
       </footer>
