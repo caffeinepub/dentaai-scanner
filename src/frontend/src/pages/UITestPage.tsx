@@ -15,7 +15,6 @@ import {
   Layers,
   Palette,
   Play,
-  Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -48,40 +47,6 @@ function makeModerateIssueScan(): ScanResult {
         recommendation: isRisk
           ? "Schedule a dental cleaning"
           : "Continue regular brushing and flossing",
-      };
-    }),
-    timestamp: BigInt(Date.now()) * BigInt(1_000_000),
-  };
-}
-
-function makeSevereIssueScan(): ScanResult {
-  const cavities = new Set([3, 7, 14, 18]);
-  const risks = new Set([5, 12, 21, 28]);
-  return {
-    overallScore: BigInt(22),
-    teeth: Array.from({ length: 32 }, (_, i) => {
-      const num = i + 1;
-      if (cavities.has(num)) {
-        return {
-          number: BigInt(num),
-          status: "cavity" as const,
-          condition: "Active decay detected",
-          recommendation: "Immediate dental treatment required",
-        };
-      }
-      if (risks.has(num)) {
-        return {
-          number: BigInt(num),
-          status: "risk" as const,
-          condition: "Early signs of decay",
-          recommendation: "Schedule urgent dental appointment",
-        };
-      }
-      return {
-        number: BigInt(num),
-        status: "healthy" as const,
-        condition: "Normal appearance",
-        recommendation: "Continue regular brushing and flossing",
       };
     }),
     timestamp: BigInt(Date.now()) * BigInt(1_000_000),
@@ -238,19 +203,10 @@ export default function UITestPage() {
                 <Activity className="w-4 h-4 mr-2" />
                 Moderate (Score: 55)
               </Button>
-              <Button
-                variant="outline"
-                className="flex-1 rounded-full border-red-500/40 text-red-400 hover:bg-red-500/10 font-semibold"
-                onClick={() => simulateAndNavigate(makeSevereIssueScan())}
-                data-ocid="ui_test.simulate_severe.button"
-              >
-                <Zap className="w-4 h-4 mr-2" />
-                Severe (Score: 22)
-              </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-3">
               Healthy: all 32 teeth normal · Moderate: teeth 3, 7, 14, 18 at
-              risk · Severe: teeth 3, 7, 14, 18 cavities + 5, 12, 21, 28 at risk
+              risk
             </p>
           </CardContent>
         </Card>

@@ -2,7 +2,6 @@ import LogoCircle from "@/components/LogoCircle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useScanContext } from "@/context/ScanContext";
 import { useActor } from "@/hooks/useActor";
 import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -185,7 +184,6 @@ function StarPicker({
 export default function HomePage() {
   const navigate = useNavigate();
   const { identity, login, clear } = useInternetIdentity();
-  const { setScanResult } = useScanContext();
   const { actor } = useActor();
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -205,43 +203,6 @@ export default function HomePage() {
       .then((count) => setUnreadCount(Number(count)))
       .catch(() => {});
   }, [actor, identity]);
-
-  function makeSevereIssueScan() {
-    const cavities = new Set([3, 7, 14, 18]);
-    const risks = new Set([5, 12, 21, 28]);
-    return {
-      overallScore: BigInt(22),
-      teeth: Array.from({ length: 32 }, (_, i) => {
-        const num = i + 1;
-        if (cavities.has(num))
-          return {
-            number: BigInt(num),
-            status: "cavity" as const,
-            condition: "Active decay detected",
-            recommendation: "Immediate dental treatment required",
-          };
-        if (risks.has(num))
-          return {
-            number: BigInt(num),
-            status: "risk" as const,
-            condition: "Early signs of decay",
-            recommendation: "Schedule urgent dental appointment",
-          };
-        return {
-          number: BigInt(num),
-          status: "healthy" as const,
-          condition: "Normal appearance",
-          recommendation: "Continue regular brushing and flossing",
-        };
-      }),
-      timestamp: BigInt(Date.now()) * BigInt(1_000_000),
-    };
-  }
-
-  const handleSimulateSevere = () => {
-    setScanResult(makeSevereIssueScan());
-    navigate({ to: "/results" });
-  };
 
   const handleStartScan = () => {
     if (identity) {
@@ -428,16 +389,6 @@ export default function HomePage() {
               data-ocid="home.demo.button"
             >
               ▶ Watch Demo
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-base px-8 py-6 rounded-full border-red-500/50 text-red-400 hover:bg-red-500/10 font-semibold"
-              onClick={handleSimulateSevere}
-              data-ocid="home.simulate_severe.button"
-            >
-              <Zap className="w-5 h-5 mr-2" />
-              Simulate Severe Scan
             </Button>
             {identity ? (
               <Button
