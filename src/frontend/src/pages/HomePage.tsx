@@ -504,65 +504,6 @@ export default function HomePage() {
           ))}
         </motion.div>
 
-        {/* How It Works */}
-        <motion.section
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.7 }}
-          className="mt-28 max-w-5xl w-full"
-        >
-          <div className="text-center mb-12">
-            <p className="text-primary text-sm font-semibold uppercase tracking-[0.2em] mb-2">
-              Simple Process
-            </p>
-            <h2 className="font-display text-4xl md:text-5xl font-bold text-gradient-gold">
-              How It Works
-            </h2>
-            <p className="text-muted-foreground mt-3 max-w-md mx-auto">
-              From camera to diagnosis in three effortless steps.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-            <div className="hidden md:block absolute top-[52px] left-[calc(16.66%+24px)] right-[calc(16.66%+24px)] h-[2px] bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30" />
-            {HOW_IT_WORKS.map((step, i) => (
-              <motion.div
-                key={step.step}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15, duration: 0.5 }}
-                className="glass-card rounded-3xl p-6 flex flex-col items-center text-center relative"
-              >
-                <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center mb-4 font-display font-bold text-lg relative z-10"
-                  style={{
-                    background: "oklch(0.22 0.08 85 / 0.9)",
-                    border: "2px solid oklch(0.72 0.15 85 / 0.6)",
-                    boxShadow: "0 0 20px oklch(0.72 0.15 85 / 0.3)",
-                    color: "oklch(0.88 0.18 85)",
-                  }}
-                >
-                  {step.step}
-                </div>
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center mb-3"
-                  style={{ background: "oklch(0.18 0.05 85 / 0.6)" }}
-                >
-                  <step.icon className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-display font-bold text-lg mb-2">
-                  {step.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {step.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
-
         {/* Dental Passport Section */}
         <motion.section
           initial={{ opacity: 0, y: 50 }}
@@ -667,6 +608,65 @@ export default function HomePage() {
                 📋 Issue a Passport
               </button>
             </Link>
+          </div>
+        </motion.section>
+
+        {/* How It Works */}
+        <motion.section
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7 }}
+          className="mt-28 max-w-5xl w-full"
+        >
+          <div className="text-center mb-12">
+            <p className="text-primary text-sm font-semibold uppercase tracking-[0.2em] mb-2">
+              Simple Process
+            </p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-gradient-gold">
+              How It Works
+            </h2>
+            <p className="text-muted-foreground mt-3 max-w-md mx-auto">
+              From camera to diagnosis in three effortless steps.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            <div className="hidden md:block absolute top-[52px] left-[calc(16.66%+24px)] right-[calc(16.66%+24px)] h-[2px] bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30" />
+            {HOW_IT_WORKS.map((step, i) => (
+              <motion.div
+                key={step.step}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.5 }}
+                className="glass-card rounded-3xl p-6 flex flex-col items-center text-center relative"
+              >
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center mb-4 font-display font-bold text-lg relative z-10"
+                  style={{
+                    background: "oklch(0.22 0.08 85 / 0.9)",
+                    border: "2px solid oklch(0.72 0.15 85 / 0.6)",
+                    boxShadow: "0 0 20px oklch(0.72 0.15 85 / 0.3)",
+                    color: "oklch(0.88 0.18 85)",
+                  }}
+                >
+                  {step.step}
+                </div>
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center mb-3"
+                  style={{ background: "oklch(0.18 0.05 85 / 0.6)" }}
+                >
+                  <step.icon className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-display font-bold text-lg mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {step.desc}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </motion.section>
 
