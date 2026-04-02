@@ -500,6 +500,20 @@ export default function HomePage() {
               >
                 ▶ Watch Demo
               </motion.button>
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => navigate({ to: "/pitch" })}
+                data-ocid="home.pitch.button"
+                className="flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-semibold border transition-all hover:bg-yellow-500/10"
+                style={{
+                  border: "1px solid oklch(0.72 0.15 85 / 0.35)",
+                  color: "oklch(0.75 0.12 85)",
+                }}
+              >
+                📊 Our Pitch
+              </motion.button>
             </motion.div>
 
             {/* Trust micro-copy */}
@@ -1308,7 +1322,7 @@ export default function HomePage() {
                   DANTANOVA.14@gmail.com
                 </a>
                 <a
-                  href="https://linkedin.com"
+                  href="https://www.linkedin.com/in/dantanova-dental-ai-aa33a8400"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:bg-yellow-500/10"
@@ -1880,7 +1894,7 @@ export default function HomePage() {
                       [
                         "https://twitter.com",
                         "https://instagram.com",
-                        "https://linkedin.com",
+                        "https://www.linkedin.com/in/dantanova-dental-ai-aa33a8400",
                       ][i]
                     }
                     target="_blank"

@@ -22,6 +22,7 @@ import ResultsPage from "@/pages/ResultsPage";
 import ScanPage from "@/pages/ScanPage";
 import TermsPage from "@/pages/TermsPage";
 import UITestPage from "@/pages/UITestPage";
+import YStatementPage from "@/pages/YStatementPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Link,
@@ -191,6 +192,12 @@ const uiTestRoute = createRoute({
   component: UITestPage,
 });
 
+const pitchRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/pitch",
+  component: YStatementPage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   scanRoute,
@@ -212,6 +219,7 @@ const routeTree = rootRoute.addChildren([
   passportLookupRoute,
   demoRoute,
   uiTestRoute,
+  pitchRoute,
 ]);
 
 const router = createRouter({ routeTree });
