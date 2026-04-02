@@ -1273,23 +1273,6 @@ export default function HomePage() {
             </h2>
           </div>
           <div className="flex flex-col md:flex-row items-center md:items-start gap-10">
-            {/* Portrait */}
-            <div className="shrink-0">
-              <div
-                className="w-40 h-40 rounded-full overflow-hidden"
-                style={{
-                  border: "3px solid oklch(0.72 0.15 85 / 0.7)",
-                  boxShadow: "0 0 40px oklch(0.72 0.15 85 / 0.3)",
-                }}
-              >
-                <img
-                  src="/assets/generated/founder-portrait.dim_400x400.jpg"
-                  alt="Swanandi Manoj Vispute, Founder of DantaNova"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-            {/* Story */}
             <div className="flex flex-col gap-4 max-w-xl">
               <h3
                 className="font-display font-bold text-2xl"
