@@ -114,6 +114,78 @@ const STATIC_TESTIMONIALS = [
     city: "Delhi",
     rating: 5,
   },
+  {
+    quote:
+      "I was skeptical at first, but the scan detected early gum inflammation I had no idea about. My dentist confirmed it. Truly impressive!",
+    name: "Rahul S.",
+    role: "Software Engineer",
+    city: "Bengaluru",
+    rating: 5,
+  },
+  {
+    quote:
+      "Dental Passport saved me so much stress while traveling in Europe. My dentist records were instantly shared and I got treated without paying upfront.",
+    name: "Meera T.",
+    role: "International Student",
+    city: "London",
+    rating: 5,
+  },
+  {
+    quote:
+      "As a dentist myself, I'm impressed by the accuracy of the AI triage. Patients come in better prepared after using DantaNova.",
+    name: "Dr. Ankit V.",
+    role: "Dentist",
+    city: "Pune",
+    rating: 5,
+  },
+  {
+    quote:
+      "Booked an emergency appointment in under 15 minutes when I had a cracked tooth. The urgency filter is brilliant.",
+    name: "Fatima H.",
+    role: "Expat Professional",
+    city: "Abu Dhabi",
+    rating: 5,
+  },
+  {
+    quote:
+      "Finally an app that makes dental care less scary. The color-coded 3D teeth are so easy to understand even for my elderly parents.",
+    name: "Neha P.",
+    role: "Working Mother",
+    city: "Chennai",
+    rating: 5,
+  },
+  {
+    quote:
+      "Used DantaNova before a long trek in the Himalayas to make sure I had no hidden dental issues. Gave me complete peace of mind.",
+    name: "Vikram R.",
+    role: "Adventure Traveler",
+    city: "Jaipur",
+    rating: 5,
+  },
+  {
+    quote:
+      "The platform is smooth, fast, and incredibly intuitive. My students now use it as part of our oral hygiene curriculum.",
+    name: "Dr. Sunita K.",
+    role: "Health Educator",
+    city: "Hyderabad",
+    rating: 5,
+  },
+  {
+    quote:
+      "I referred three colleagues to DantaNova. The dental passport concept is a game-changer for people who travel for work like us.",
+    name: "Carlos M.",
+    role: "Corporate Consultant",
+    city: "Singapore",
+    rating: 5,
+  },
+  {
+    quote:
+      "Got results in seconds, and the recommendation to see a dentist for Tooth 14 turned out to be a small cavity caught just in time.",
+    name: "Sana A.",
+    role: "University Student",
+    city: "Kolkata",
+    rating: 5,
+  },
 ];
 
 const STORAGE_KEY = "dantanova_testimonials";
