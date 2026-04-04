@@ -8,6 +8,7 @@ import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Activity,
+  AlertTriangle,
   Brain,
   CalendarCheck,
   Camera,
@@ -86,6 +87,12 @@ const HOW_IT_WORKS = [
     icon: Zap,
     title: "Get Results",
     desc: "Receive a full 3D color-coded arch report in seconds with actionable recommendations.",
+  },
+  {
+    step: "04",
+    icon: CalendarCheck,
+    title: "Book a Dentist if Needed",
+    desc: "If issues are detected, connect to a verified emergency dentist near you — in minutes.",
   },
 ];
 
@@ -515,10 +522,10 @@ export default function HomePage() {
               transition={{ delay: 0.15, duration: 0.7 }}
               className="font-display text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.08] mb-6"
             >
-              Detect Dental Problems
+              AI Dental Scan in 30 Seconds
               <br />
               <span className="text-gradient-gold">
-                Before They Cost You Thousands
+                Know Your Oral Health Instantly
               </span>
             </motion.h1>
 
@@ -528,9 +535,8 @@ export default function HomePage() {
               transition={{ delay: 0.28, duration: 0.6 }}
               className="text-muted-foreground text-lg md:text-xl max-w-2xl leading-relaxed mb-10"
             >
-              AI-powered dental scanning from your phone. Instant 3D results,
-              emergency dentist connection, and your dental records — wherever
-              you travel.
+              Detect cavities, gum disease &amp; 15+ conditions from your phone.
+              No clinic visit needed.
             </motion.p>
 
             {/* CTAs */}
@@ -546,12 +552,12 @@ export default function HomePage() {
                 whileTap={{ scale: 0.97 }}
                 onClick={handleStartScan}
                 data-ocid="home.primary_button"
-                className="flex items-center justify-center gap-2 px-8 py-4 rounded-full font-semibold text-base transition-all"
+                className="flex items-center justify-center gap-2 px-10 py-5 rounded-full font-semibold text-lg transition-all"
                 style={{
                   background:
                     "linear-gradient(135deg, oklch(0.82 0.18 85), oklch(0.68 0.16 80))",
                   color: "oklch(0.06 0.01 60)",
-                  boxShadow: "0 4px 28px oklch(0.72 0.15 85 / 0.45)",
+                  boxShadow: "0 6px 40px oklch(0.72 0.15 85 / 0.6)",
                 }}
               >
                 <ScanLine className="w-5 h-5" />
@@ -586,6 +592,29 @@ export default function HomePage() {
               >
                 📊 Our Pitch
               </motion.button>
+            </motion.div>
+
+            {/* Trust nudge row */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium mb-4"
+              style={{ color: "oklch(0.72 0.08 85)" }}
+            >
+              {[
+                "🔒 100% Private",
+                "No app download",
+                "Results in 30 seconds",
+                "Free forever",
+              ].map((t, i) => (
+                <span key={t} className="flex items-center gap-1.5">
+                  {i > 0 && (
+                    <span className="opacity-30 hidden sm:inline">•</span>
+                  )}
+                  {t}
+                </span>
+              ))}
             </motion.div>
 
             {/* Trust micro-copy */}
@@ -661,15 +690,16 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
+                whileHover={{ scale: 1.04 }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="rounded-2xl p-6 text-center"
+                className="rounded-2xl p-6 text-center cursor-default"
                 style={{
                   background: "oklch(0.12 0.04 85 / 0.7)",
                   border: "1px solid oklch(0.72 0.15 85 / 0.3)",
                   boxShadow: "0 0 24px oklch(0.72 0.15 85 / 0.06)",
                 }}
               >
-                <p className="font-display text-4xl font-bold text-gradient-gold">
+                <p className="font-display text-5xl md:text-6xl font-bold text-gradient-gold">
                   {stat.value}
                 </p>
                 <p className="text-xs text-muted-foreground mt-2 tracking-wide uppercase">
@@ -860,6 +890,277 @@ export default function HomePage() {
                 Try It Now — It&apos;s Free
               </motion.button>
             </motion.div>
+          </div>
+        </motion.section>
+
+        {/* ── SAMPLE SCAN OUTPUT ── */}
+        <motion.section
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          className="w-full max-w-5xl px-6 py-16"
+        >
+          <div className="text-center mb-12">
+            <p
+              className="text-xs font-bold uppercase tracking-[0.25em] mb-3"
+              style={{ color: "oklch(0.82 0.16 85)" }}
+            >
+              Real Output Preview
+            </p>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-gradient-gold mb-4">
+              Here&apos;s What You&apos;ll See After Your Scan
+            </h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              This is exactly what a DantaNova scan result looks like —
+              tooth-by-tooth, color-coded.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            {/* LEFT: Health Score + Triage Banner */}
+            <div className="flex flex-col gap-6">
+              {/* Health Score Circle */}
+              <div
+                className="rounded-3xl p-8 flex flex-col items-center gap-3"
+                style={{
+                  background: "oklch(0.11 0.04 85 / 0.85)",
+                  border: "1px solid oklch(0.72 0.15 85 / 0.3)",
+                  boxShadow: "0 0 32px oklch(0.72 0.15 85 / 0.08)",
+                }}
+              >
+                <div
+                  className="w-36 h-36 rounded-full flex flex-col items-center justify-center relative"
+                  style={{
+                    border: "5px solid oklch(0.82 0.18 85)",
+                    boxShadow:
+                      "0 0 28px oklch(0.72 0.15 85 / 0.35), inset 0 0 20px oklch(0.72 0.15 85 / 0.08)",
+                    background: "oklch(0.10 0.035 85 / 0.9)",
+                  }}
+                >
+                  <span
+                    className="font-display text-5xl font-bold leading-none"
+                    style={{ color: "oklch(0.88 0.18 85)" }}
+                  >
+                    72
+                  </span>
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: "oklch(0.65 0.08 85)" }}
+                  >
+                    /100
+                  </span>
+                </div>
+                <p
+                  className="text-xs font-bold uppercase tracking-[0.2em]"
+                  style={{ color: "oklch(0.72 0.1 85)" }}
+                >
+                  Health Score
+                </p>
+              </div>
+              {/* Triage Banner */}
+              <div
+                className="rounded-2xl p-5 flex items-start gap-4"
+                style={{
+                  background: "oklch(0.16 0.08 75 / 0.4)",
+                  border: "1px solid oklch(0.75 0.18 75 / 0.4)",
+                  borderLeft: "4px solid oklch(0.82 0.18 75)",
+                }}
+              >
+                <AlertTriangle
+                  className="w-5 h-5 shrink-0 mt-0.5"
+                  style={{ color: "oklch(0.88 0.18 75)" }}
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span
+                      className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full"
+                      style={{
+                        background: "oklch(0.78 0.18 75 / 0.2)",
+                        border: "1px solid oklch(0.78 0.18 75 / 0.5)",
+                        color: "oklch(0.88 0.18 75)",
+                      }}
+                    >
+                      Moderate
+                    </span>
+                  </div>
+                  <p
+                    className="text-sm"
+                    style={{ color: "oklch(0.82 0.1 75)" }}
+                  >
+                    Some issues detected. A dentist visit is recommended soon.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT: Issue Cards */}
+            <div className="flex flex-col gap-4">
+              {/* Cavity Card */}
+              <div
+                className="rounded-2xl p-5 flex flex-col gap-3"
+                style={{
+                  background: "oklch(0.11 0.04 85 / 0.85)",
+                  border: "1px solid oklch(0.55 0.18 20 / 0.4)",
+                  borderLeft: "4px solid oklch(0.65 0.22 20)",
+                  boxShadow: "0 0 16px oklch(0.55 0.18 20 / 0.12)",
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span
+                    className="font-semibold text-sm"
+                    style={{ color: "oklch(0.88 0.06 85)" }}
+                  >
+                    Tooth #14
+                  </span>
+                  <span
+                    className="text-xs font-bold px-3 py-1 rounded-full"
+                    style={{
+                      background: "oklch(0.55 0.18 20 / 0.2)",
+                      border: "1px solid oklch(0.55 0.18 20 / 0.5)",
+                      color: "oklch(0.75 0.2 20)",
+                    }}
+                  >
+                    Cavity / Decay
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  <span
+                    className="font-medium"
+                    style={{ color: "oklch(0.7 0.05 85)" }}
+                  >
+                    Condition:
+                  </span>{" "}
+                  Early-stage cavity detected
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  <span
+                    className="font-medium"
+                    style={{ color: "oklch(0.7 0.05 85)" }}
+                  >
+                    Recommendation:
+                  </span>{" "}
+                  Schedule a dental filling within 4–6 weeks.
+                </p>
+              </div>
+
+              {/* Risk Card */}
+              <div
+                className="rounded-2xl p-5 flex flex-col gap-3"
+                style={{
+                  background: "oklch(0.11 0.04 85 / 0.85)",
+                  border: "1px solid oklch(0.72 0.16 75 / 0.4)",
+                  borderLeft: "4px solid oklch(0.82 0.18 75)",
+                  boxShadow: "0 0 16px oklch(0.72 0.16 75 / 0.1)",
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span
+                    className="font-semibold text-sm"
+                    style={{ color: "oklch(0.88 0.06 85)" }}
+                  >
+                    Tooth #22
+                  </span>
+                  <span
+                    className="text-xs font-bold px-3 py-1 rounded-full"
+                    style={{
+                      background: "oklch(0.72 0.16 75 / 0.2)",
+                      border: "1px solid oklch(0.72 0.16 75 / 0.5)",
+                      color: "oklch(0.88 0.18 75)",
+                    }}
+                  >
+                    Risk Detected
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  <span
+                    className="font-medium"
+                    style={{ color: "oklch(0.7 0.05 85)" }}
+                  >
+                    Condition:
+                  </span>{" "}
+                  Mild gum inflammation
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  <span
+                    className="font-medium"
+                    style={{ color: "oklch(0.7 0.05 85)" }}
+                  >
+                    Recommendation:
+                  </span>{" "}
+                  Improve flossing routine and use antiseptic mouthwash.
+                </p>
+              </div>
+
+              {/* Healthy Card */}
+              <div
+                className="rounded-2xl p-5 flex flex-col gap-3"
+                style={{
+                  background: "oklch(0.11 0.04 85 / 0.85)",
+                  border: "1px solid oklch(0.62 0.16 142 / 0.4)",
+                  borderLeft: "4px solid oklch(0.72 0.18 142)",
+                  boxShadow: "0 0 16px oklch(0.62 0.16 142 / 0.1)",
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span
+                    className="font-semibold text-sm"
+                    style={{ color: "oklch(0.88 0.06 85)" }}
+                  >
+                    Tooth #8
+                  </span>
+                  <span
+                    className="text-xs font-bold px-3 py-1 rounded-full"
+                    style={{
+                      background: "oklch(0.62 0.16 142 / 0.2)",
+                      border: "1px solid oklch(0.62 0.16 142 / 0.5)",
+                      color: "oklch(0.78 0.18 142)",
+                    }}
+                  >
+                    Healthy
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  <span
+                    className="font-medium"
+                    style={{ color: "oklch(0.7 0.05 85)" }}
+                  >
+                    Condition:
+                  </span>{" "}
+                  No issues detected
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  <span
+                    className="font-medium"
+                    style={{ color: "oklch(0.7 0.05 85)" }}
+                  >
+                    Recommendation:
+                  </span>{" "}
+                  Continue your current oral hygiene routine.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-10">
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleStartScan}
+              data-ocid="sample_scan.primary_button"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-base transition-all"
+              style={{
+                background:
+                  "linear-gradient(135deg, oklch(0.82 0.18 85), oklch(0.68 0.16 80))",
+                color: "oklch(0.06 0.01 60)",
+                boxShadow: "0 4px 28px oklch(0.72 0.15 85 / 0.4)",
+              }}
+            >
+              <ScanLine className="w-5 h-5" />
+              Run Your Own Scan →
+            </motion.button>
           </div>
         </motion.section>
 
@@ -1099,6 +1400,57 @@ export default function HomePage() {
           </div>
         </motion.section>
 
+        {/* ── DEMO CTA BANNER ── */}
+        <motion.section
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          className="w-full max-w-5xl px-6 py-10"
+        >
+          <div
+            className="rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6"
+            style={{
+              background:
+                "linear-gradient(135deg, oklch(0.20 0.08 85 / 0.9), oklch(0.14 0.05 85 / 0.95))",
+              border: "1.5px solid oklch(0.72 0.15 85 / 0.5)",
+              boxShadow: "0 0 40px oklch(0.72 0.15 85 / 0.15)",
+            }}
+          >
+            <div>
+              <p
+                className="text-xs font-bold uppercase tracking-[0.25em] mb-2"
+                style={{ color: "oklch(0.82 0.16 85)" }}
+              >
+                Demo
+              </p>
+              <h3 className="font-display text-2xl font-bold mb-2 text-foreground">
+                See DantaNova in Action
+              </h3>
+              <p className="text-muted-foreground text-sm max-w-md">
+                Watch an end-to-end scan — from camera to 3D results to booking
+                a dentist. No sign-up needed.
+              </p>
+            </div>
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate({ to: "/demo" })}
+              data-ocid="demo_banner.primary_button"
+              className="shrink-0 flex items-center gap-2 px-8 py-4 rounded-full font-bold text-base transition-all"
+              style={{
+                background:
+                  "linear-gradient(135deg, oklch(0.82 0.18 85), oklch(0.68 0.16 80))",
+                color: "oklch(0.06 0.01 60)",
+                boxShadow: "0 4px 28px oklch(0.72 0.15 85 / 0.4)",
+              }}
+            >
+              ▶ Watch Demo Scan
+            </motion.button>
+          </div>
+        </motion.section>
+
         {/* ── HOW IT WORKS ── */}
         <motion.section
           variants={sectionVariants}
@@ -1118,12 +1470,12 @@ export default function HomePage() {
               How It Works
             </h2>
             <p className="text-muted-foreground max-w-md mx-auto">
-              From camera to diagnosis in three effortless steps.
+              From camera to diagnosis in four effortless steps.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-            <div className="hidden md:block absolute top-[52px] left-[calc(16.66%+24px)] right-[calc(16.66%+24px)] h-[2px] bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+            <div className="hidden md:block absolute top-[52px] left-[calc(12.5%+24px)] right-[calc(12.5%+24px)] h-[2px] bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30" />
             {HOW_IT_WORKS.map((step, i) => (
               <motion.div
                 key={step.step}
@@ -1434,8 +1786,138 @@ export default function HomePage() {
             </p>
           </div>
 
+          {/* Trust Badge Strip */}
+          <div className="flex flex-wrap gap-3 justify-center mb-10">
+            {[
+              { icon: "🔐", label: "End-to-End Encrypted" },
+              { icon: "✅", label: "GDPR Compliant" },
+              { icon: "⛓", label: "Blockchain Secured" },
+              { icon: "🎯", label: "94% Detection Accuracy" },
+              { icon: "♾️", label: "Free Forever" },
+              { icon: "🩺", label: "Clinically Aligned" },
+            ].map((badge) => (
+              <span
+                key={badge.label}
+                className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wide flex items-center gap-1.5"
+                style={{
+                  background: "oklch(0.15 0.06 85 / 0.6)",
+                  border: "1.5px solid oklch(0.72 0.15 85 / 0.4)",
+                  color: "oklch(0.85 0.14 85)",
+                }}
+              >
+                <span>{badge.icon}</span>
+                {badge.label}
+              </span>
+            ))}
+          </div>
+
+          {/* Featured Reviews */}
+          <div className="mb-10">
+            <p
+              className="text-xs font-bold uppercase tracking-[0.25em] mb-6 text-center"
+              style={{ color: "oklch(0.82 0.16 85)" }}
+            >
+              ⭐ Featured Reviews
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {STATIC_TESTIMONIALS.slice(0, 3).map((t, idx) => (
+                <motion.div
+                  key={`featured-${t.name}`}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.6, delay: idx * 0.12 }}
+                  className="rounded-3xl p-8 flex flex-col gap-4 relative overflow-hidden"
+                  style={{
+                    background: "oklch(0.12 0.045 85 / 0.9)",
+                    border: "1.5px solid oklch(0.75 0.18 85 / 0.5)",
+                    boxShadow: "0 0 20px oklch(0.72 0.15 85 / 0.2)",
+                  }}
+                  data-ocid={`testimonials.item.${idx + 1}`}
+                >
+                  <span
+                    className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full self-start"
+                    style={{
+                      background: "oklch(0.82 0.18 85 / 0.15)",
+                      border: "1px solid oklch(0.82 0.18 85 / 0.35)",
+                      color: "oklch(0.88 0.18 85)",
+                    }}
+                  >
+                    ⭐ Featured Review
+                  </span>
+                  <div
+                    className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-3xl"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, oklch(0.88 0.18 85), oklch(0.68 0.16 80))",
+                    }}
+                  />
+                  <div className="flex gap-1 pl-2">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <Star
+                        key={n}
+                        className="w-4 h-4"
+                        style={{
+                          color:
+                            n <= t.rating
+                              ? "oklch(0.88 0.18 85)"
+                              : "oklch(0.35 0.03 70)",
+                          fill:
+                            n <= t.rating
+                              ? "oklch(0.88 0.18 85)"
+                              : "transparent",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-base text-muted-foreground leading-relaxed italic pl-2">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  <div className="mt-auto pl-2 flex items-center gap-3">
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                      style={{
+                        background: "oklch(0.20 0.08 85 / 0.7)",
+                        border: "1.5px solid oklch(0.72 0.15 85 / 0.4)",
+                        color: "oklch(0.88 0.18 85)",
+                      }}
+                    >
+                      {t.name[0]}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm text-foreground">
+                        {t.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {t.role} · {t.city}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-4 mb-8">
+            <div
+              className="flex-1 h-px"
+              style={{ background: "oklch(0.72 0.15 85 / 0.15)" }}
+            />
+            <p
+              className="text-xs font-bold uppercase tracking-[0.2em] whitespace-nowrap"
+              style={{ color: "oklch(0.72 0.1 85)" }}
+            >
+              More Reviews from Our Community
+            </p>
+            <div
+              className="flex-1 h-px"
+              style={{ background: "oklch(0.72 0.15 85 / 0.15)" }}
+            />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {STATIC_TESTIMONIALS.map((t, idx) => (
+            {STATIC_TESTIMONIALS.slice(3).map((t, idx) => (
               <motion.div
                 key={t.name}
                 initial={{ opacity: 0, y: 30 }}
@@ -1448,7 +1930,7 @@ export default function HomePage() {
                   border: "1px solid oklch(0.75 0.18 85 / 0.35)",
                   boxShadow: "0 0 18px oklch(0.75 0.18 85 / 0.06)",
                 }}
-                data-ocid={`testimonials.item.${idx + 1}`}
+                data-ocid={`testimonials.item.${idx + 4}`}
               >
                 {/* Gold left accent */}
                 <div
