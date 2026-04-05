@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, type Variants, motion } from "motion/react";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const _FEATURES = [
@@ -256,6 +256,720 @@ function StarPicker({
   );
 }
 
+function HeroParticles() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    let width = canvas.offsetWidth;
+    let height = canvas.offsetHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    const PARTICLE_COUNT = 28;
+    interface Particle {
+      x: number;
+      y: number;
+      r: number;
+      vx: number;
+      vy: number;
+      alpha: number;
+      alphaDir: number;
+    }
+    const particles: Particle[] = Array.from(
+      { length: PARTICLE_COUNT },
+      () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: 0.8 + Math.random() * 2.2,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: -0.15 - Math.random() * 0.45,
+        alpha: 0.15 + Math.random() * 0.5,
+        alphaDir: Math.random() > 0.5 ? 1 : -1,
+      }),
+    );
+
+    function draw() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, width, height);
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha += p.alphaDir * 0.004;
+        if (p.alpha > 0.65 || p.alpha < 0.08) p.alphaDir *= -1;
+        if (p.y < -10) {
+          p.y = height + 5;
+          p.x = Math.random() * width;
+        }
+        if (p.x < -10) p.x = width + 5;
+        if (p.x > width + 10) p.x = -5;
+
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
+        grad.addColorStop(0, `rgba(229, 195, 80, ${p.alpha})`);
+        grad.addColorStop(0.5, `rgba(210, 160, 40, ${p.alpha * 0.55})`);
+        grad.addColorStop(1, "rgba(200, 140, 20, 0)");
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 220, 100, ${p.alpha})`;
+        ctx.fill();
+      }
+      animId = requestAnimationFrame(draw);
+    }
+
+    draw();
+
+    const handleResize = () => {
+      width = canvas.offsetWidth;
+      height = canvas.offsetHeight;
+      canvas.width = width;
+      canvas.height = height;
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{ zIndex: 1 }}
+    />
+  );
+}
+
+function IronManHUD() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    let scanY = 0;
+    let time = 0;
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    function draw() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      time += 0.016;
+
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Animated scan line (neon blue)
+      scanY = (scanY + 1.5) % h;
+      const grad = ctx.createLinearGradient(0, scanY - 30, 0, scanY + 30);
+      grad.addColorStop(0, "rgba(0, 209, 255, 0)");
+      grad.addColorStop(0.5, "rgba(0, 209, 255, 0.35)");
+      grad.addColorStop(1, "rgba(0, 209, 255, 0)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, scanY - 30, w, 60);
+
+      // Bright scan line
+      ctx.strokeStyle = "rgba(0, 209, 255, 0.6)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, scanY);
+      ctx.lineTo(w, scanY);
+      ctx.stroke();
+
+      // Corner HUD brackets
+      const bSize = 24;
+      const bGap = 12;
+      ctx.strokeStyle = "rgba(0, 209, 255, 0.7)";
+      ctx.lineWidth = 2;
+
+      const corners = [
+        [bGap, bGap, 1, 1],
+        [w - bGap, bGap, -1, 1],
+        [bGap, h - bGap, 1, -1],
+        [w - bGap, h - bGap, -1, -1],
+      ] as const;
+
+      for (const [cx, cy, dx, dy] of corners) {
+        ctx.beginPath();
+        ctx.moveTo(cx + dx * bSize, cy);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(cx, cy + dy * bSize);
+        ctx.stroke();
+      }
+
+      // Circular reticle at center
+      const cx = w / 2;
+      const cy = h * 0.42;
+
+      // Outer ring (rotating)
+      ctx.strokeStyle = `rgba(0, 209, 255, ${0.15 + Math.sin(time * 2) * 0.05})`;
+      ctx.lineWidth = 1;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(time * 0.3);
+      ctx.setLineDash([4, 8]);
+      ctx.beginPath();
+      ctx.arc(0, 0, 110, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      // Inner ring (counter-rotating)
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(-time * 0.5);
+      ctx.strokeStyle = `rgba(123, 97, 255, ${0.2 + Math.sin(time * 3) * 0.08})`;
+      ctx.setLineDash([2, 12]);
+      ctx.beginPath();
+      ctx.arc(0, 0, 75, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      // Crosshair lines
+      ctx.strokeStyle = "rgba(0, 209, 255, 0.12)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx - 130, cy);
+      ctx.lineTo(cx + 130, cy);
+      ctx.moveTo(cx, cy - 130);
+      ctx.lineTo(cx, cy + 130);
+      ctx.stroke();
+
+      // HUD data text (top-left)
+      ctx.fillStyle = "rgba(0, 209, 255, 0.55)";
+      ctx.font = "10px monospace";
+      ctx.fillText("AI SCAN ACTIVE", bGap + 2, bGap + bSize + 16);
+      ctx.fillStyle = "rgba(0, 209, 255, 0.3)";
+      ctx.fillText(
+        `FRAME: ${Math.floor(time * 60)
+          .toString()
+          .padStart(6, "0")}`,
+        bGap + 2,
+        bGap + bSize + 32,
+      );
+      ctx.fillText("SIGNAL: ████████░░ 82%", bGap + 2, bGap + bSize + 48);
+
+      // HUD data text (top-right)
+      const txt = ["NEURAL NET: READY", "TEETH: 32/32", "STATUS: ANALYZING"];
+      for (let i = 0; i < txt.length; i++) {
+        ctx.fillStyle =
+          i === 2
+            ? `rgba(0, 209, 255, ${0.4 + Math.sin(time * 4 + i) * 0.2})`
+            : "rgba(0, 209, 255, 0.3)";
+        const m = ctx.measureText(txt[i]);
+        ctx.fillText(
+          txt[i],
+          w - bGap - m.width - 2,
+          bGap + bSize + 16 + i * 16,
+        );
+      }
+
+      animId = requestAnimationFrame(draw);
+    }
+
+    draw();
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{ zIndex: 4 }}
+      aria-hidden="true"
+      tabIndex={-1}
+    />
+  );
+}
+
+function NeuralNetworkAnimation() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    const W = canvas.offsetWidth;
+    const H = canvas.offsetHeight;
+    canvas.width = W;
+    canvas.height = H;
+
+    interface Node {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      r: number;
+      pulsePhase: number;
+      active: boolean;
+    }
+
+    const NODE_COUNT = 28;
+    const nodes: Node[] = Array.from({ length: NODE_COUNT }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: 2 + Math.random() * 3,
+      pulsePhase: Math.random() * Math.PI * 2,
+      active: Math.random() > 0.4,
+    }));
+
+    let time = 0;
+
+    function draw() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, W, H);
+      time += 0.018;
+
+      for (const n of nodes) {
+        n.x += n.vx;
+        n.y += n.vy;
+        if (n.x < 0 || n.x > W) n.vx *= -1;
+        if (n.y < 0 || n.y > H) n.vy *= -1;
+        if (Math.random() < 0.002) n.active = !n.active;
+      }
+
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 140) {
+            const alpha = (1 - dist / 140) * 0.35;
+            const bothActive = nodes[i].active && nodes[j].active;
+            if (bothActive) {
+              ctx.strokeStyle = `rgba(0, 209, 255, ${alpha * 0.8})`;
+              ctx.lineWidth = 0.8;
+            } else {
+              ctx.strokeStyle = `rgba(123, 97, 255, ${alpha * 0.3})`;
+              ctx.lineWidth = 0.5;
+            }
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.stroke();
+
+            if (bothActive && dist < 80) {
+              const t2 = (time * 2) % 1;
+              const px = nodes[i].x + (nodes[j].x - nodes[i].x) * t2;
+              const py = nodes[i].y + (nodes[j].y - nodes[i].y) * t2;
+              ctx.beginPath();
+              ctx.arc(px, py, 2, 0, Math.PI * 2);
+              ctx.fillStyle = "rgba(0, 209, 255, 0.9)";
+              ctx.fill();
+            }
+          }
+        }
+      }
+
+      for (const n of nodes) {
+        const pulse = Math.sin(time * 3 + n.pulsePhase) * 0.5 + 0.5;
+        if (n.active) {
+          const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 5);
+          grd.addColorStop(0, `rgba(0, 209, 255, ${0.6 + pulse * 0.4})`);
+          grd.addColorStop(0.4, `rgba(0, 209, 255, ${0.2 + pulse * 0.1})`);
+          grd.addColorStop(1, "rgba(0, 209, 255, 0)");
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r * 5, 0, Math.PI * 2);
+          ctx.fillStyle = grd;
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(0, 209, 255, ${0.8 + pulse * 0.2})`;
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r * 0.7, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(123, 97, 255, ${0.3 + pulse * 0.2})`;
+          ctx.fill();
+        }
+      }
+
+      animId = requestAnimationFrame(draw);
+    }
+
+    draw();
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="w-full h-full"
+      aria-hidden="true"
+      tabIndex={-1}
+    />
+  );
+}
+
+function LiveDemoSection() {
+  const [isDragging, setIsDragging] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file?.type.startsWith("image/")) {
+      processFile(file);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const processFile = (file: File) => {
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    setIsAnalyzing(true);
+    setShowResult(false);
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      setShowResult(true);
+    }, 2800);
+  };
+
+  const reset = () => {
+    setPreviewUrl(null);
+    setIsAnalyzing(false);
+    setShowResult(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const DEMO_RESULTS = [
+    {
+      tooth: "#14",
+      condition: "Early Cavity Detected",
+      severity: "red" as const,
+      icon: "⚠",
+    },
+    {
+      tooth: "#22",
+      condition: "Gum Inflammation Risk",
+      severity: "yellow" as const,
+      icon: "●",
+    },
+    {
+      tooth: "#8",
+      condition: "Healthy",
+      severity: "green" as const,
+      icon: "✓",
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+      {/* Drop Zone */}
+      <div>
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          onClick={() => !previewUrl && fileInputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              if (!previewUrl) fileInputRef.current?.click();
+            }
+          }}
+          className="relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300"
+          style={{
+            height: 280,
+            background: isDragging
+              ? "oklch(0.12 0.08 205 / 0.7)"
+              : "oklch(0.09 0.04 220 / 0.7)",
+            border: isDragging
+              ? "2px dashed oklch(0.82 0.16 205 / 0.8)"
+              : "2px dashed oklch(0.82 0.16 205 / 0.3)",
+            boxShadow: isDragging
+              ? "0 0 40px oklch(0.82 0.16 205 / 0.3)"
+              : "none",
+          }}
+          data-ocid="live_demo.dropzone"
+        >
+          {previewUrl ? (
+            <>
+              <img
+                src={previewUrl}
+                alt="Uploaded dental scan"
+                className="w-full h-full object-cover"
+              />
+              {isAnalyzing && (
+                <div
+                  className="absolute inset-0 flex flex-col items-center justify-center"
+                  style={{ background: "oklch(0.05 0.02 220 / 0.85)" }}
+                >
+                  <motion.div
+                    className="absolute left-0 right-0 h-0.5"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, transparent, oklch(0.82 0.16 205), transparent)",
+                    }}
+                    animate={{ y: [0, 280] }}
+                    transition={{
+                      duration: 1.4,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "linear",
+                    }}
+                  />
+                  <div className="flex flex-col items-center gap-3 z-10">
+                    <div className="w-12 h-12 rounded-full border-2 border-[oklch(0.82_0.16_205)] border-t-transparent animate-spin" />
+                    <span
+                      className="text-sm font-mono animate-hud-flicker"
+                      style={{ color: "oklch(0.82 0.16 205)" }}
+                    >
+                      AI ANALYZING...
+                    </span>
+                    <div className="flex gap-1">
+                      {[0, 1, 2, 3, 4].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="w-1.5 rounded-full"
+                          style={{
+                            height: 16,
+                            background: "oklch(0.82 0.16 205)",
+                          }}
+                          animate={{ scaleY: [0.3, 1, 0.3] }}
+                          transition={{
+                            duration: 0.8,
+                            repeat: Number.POSITIVE_INFINITY,
+                            delay: i * 0.12,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  reset();
+                }}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold z-20"
+                style={{
+                  background: "oklch(0.15 0.05 220 / 0.9)",
+                  border: "1px solid oklch(0.82 0.16 205 / 0.4)",
+                  color: "oklch(0.82 0.16 205)",
+                }}
+                data-ocid="live_demo.close_button"
+              >
+                ✕
+              </button>
+            </>
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+              <motion.div
+                animate={{ y: isDragging ? -8 : 0 }}
+                transition={{ duration: 0.2 }}
+                className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+                style={{
+                  background: "oklch(0.82 0.16 205 / 0.12)",
+                  border: "1px solid oklch(0.82 0.16 205 / 0.3)",
+                }}
+              >
+                📷
+              </motion.div>
+              <div className="text-center">
+                <p
+                  className="font-semibold text-sm"
+                  style={{ color: "oklch(0.82 0.16 205)" }}
+                >
+                  {isDragging
+                    ? "Drop to analyze →"
+                    : "Drag & drop a dental photo"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  or click to upload • JPG, PNG, WEBP
+                </p>
+              </div>
+            </div>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+            data-ocid="live_demo.upload_button"
+          />
+        </div>
+      </div>
+
+      {/* Results Panel */}
+      <div
+        className="rounded-3xl p-6 min-h-[280px] flex flex-col"
+        style={{
+          background: "oklch(0.09 0.04 220 / 0.7)",
+          border: "1px solid oklch(0.82 0.16 205 / 0.2)",
+        }}
+      >
+        {!showResult && !isAnalyzing && (
+          <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center"
+              style={{
+                background: "oklch(0.12 0.05 205 / 0.5)",
+                border: "1px solid oklch(0.82 0.16 205 / 0.25)",
+              }}
+            >
+              <span style={{ color: "oklch(0.72 0.12 205)" }}>🦷</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              AI analysis results will appear here
+            </p>
+          </div>
+        )}
+        {isAnalyzing && (
+          <div
+            className="flex-1 flex flex-col gap-4 justify-center"
+            data-ocid="live_demo.loading_state"
+          >
+            {[
+              "Detecting tooth boundaries...",
+              "Analyzing enamel condition...",
+              "Checking for cavities...",
+            ].map((step, i) => (
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.7 }}
+                className="flex items-center gap-3"
+              >
+                <div
+                  className="w-4 h-4 rounded-full border border-[oklch(0.82_0.16_205)] border-t-transparent animate-spin"
+                  style={{ animationDelay: `${i * 0.2}s` }}
+                />
+                <span
+                  className="text-sm font-mono"
+                  style={{ color: "oklch(0.72 0.12 205)" }}
+                >
+                  {step}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        )}
+        {showResult && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col gap-4"
+            data-ocid="live_demo.success_state"
+          >
+            <div className="flex items-center justify-between">
+              <p
+                className="text-xs font-bold uppercase tracking-[0.2em]"
+                style={{ color: "oklch(0.82 0.16 205)" }}
+              >
+                Analysis Complete
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-xs text-green-400">72/100</span>
+              </div>
+            </div>
+            {DEMO_RESULTS.map((r) => (
+              <div
+                key={r.tooth}
+                className="rounded-xl p-3 flex items-center gap-3"
+                style={{
+                  background:
+                    r.severity === "red"
+                      ? "oklch(0.11 0.04 25 / 0.8)"
+                      : r.severity === "yellow"
+                        ? "oklch(0.12 0.04 75 / 0.6)"
+                        : "oklch(0.10 0.04 145 / 0.6)",
+                  border: `1px solid oklch(${r.severity === "red" ? "0.65 0.22 25" : r.severity === "yellow" ? "0.78 0.18 75" : "0.65 0.18 145"} / 0.4)`,
+                }}
+              >
+                <span
+                  className="font-mono text-xs font-bold w-8"
+                  style={{
+                    color:
+                      r.severity === "red"
+                        ? "oklch(0.72 0.22 25)"
+                        : r.severity === "yellow"
+                          ? "oklch(0.82 0.18 75)"
+                          : "oklch(0.72 0.18 145)",
+                  }}
+                >
+                  {r.tooth}
+                </span>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-foreground">
+                    {r.condition}
+                  </p>
+                </div>
+                <span className="text-xs">{r.icon}</span>
+              </div>
+            ))}
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              Demo preview only. Sign in for a full camera scan.
+            </p>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function useReveal() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.12 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return { ref, className: visible ? "animate-section-reveal" : "opacity-0" };
+}
+
 const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.7 } },
@@ -321,6 +1035,11 @@ export default function HomePage() {
       setIsSubmitting(false);
     }
   };
+
+  const howItWorksReveal = useReveal();
+  const dentistSectionReveal = useReveal();
+  const testimonialsReveal = useReveal();
+  const aboutReveal = useReveal();
 
   return (
     <div
@@ -479,22 +1198,238 @@ export default function HomePage() {
 
       {/* ── HERO ── */}
       <section className="relative overflow-hidden">
-        {/* Hero background image */}
-        <div className="absolute inset-0">
+        {/* ── ANIMATED GRID MESH ── */}
+        <div
+          className="absolute inset-0 hero-grid-mesh pointer-events-none"
+          style={{ zIndex: 0 }}
+          aria-hidden="true"
+        />
+
+        {/* ── 5 ANIMATED GLOW ORBS ── */}
+        {/* Orb 1 — large gold, top-left */}
+        <motion.div
+          className="absolute rounded-full blur-3xl pointer-events-none"
+          style={{
+            width: 500,
+            height: 500,
+            top: "-140px",
+            left: "-120px",
+            background: "oklch(0.72 0.18 85 / 0.12)",
+            zIndex: 1,
+          }}
+          animate={{
+            scale: [1, 1.18, 1],
+            opacity: [0.55, 0.9, 0.55],
+            x: [0, 25, 0],
+            y: [0, -18, 0],
+          }}
+          transition={{
+            duration: 9,
+            repeat: Number.POSITIVE_INFINITY,
+            repeatType: "mirror",
+            ease: "easeInOut",
+          }}
+          aria-hidden="true"
+        />
+        {/* Orb 2 — medium amber, top-right */}
+        <motion.div
+          className="absolute rounded-full blur-3xl pointer-events-none"
+          style={{
+            width: 320,
+            height: 320,
+            top: "5%",
+            right: "-80px",
+            background: "oklch(0.78 0.19 65 / 0.10)",
+            zIndex: 1,
+          }}
+          animate={{
+            scale: [1, 1.25, 0.9, 1],
+            opacity: [0.5, 0.85, 0.5],
+            x: [0, -18, 8, 0],
+            y: [0, 22, -12, 0],
+          }}
+          transition={{
+            duration: 11,
+            repeat: Number.POSITIVE_INFINITY,
+            repeatType: "mirror",
+            ease: "easeInOut",
+            delay: 1.5,
+          }}
+          aria-hidden="true"
+        />
+        {/* Orb 3 — deep teal, center-left */}
+        <motion.div
+          className="absolute rounded-full blur-3xl pointer-events-none"
+          style={{
+            width: 260,
+            height: 260,
+            top: "35%",
+            left: "5%",
+            background: "oklch(0.55 0.14 195 / 0.10)",
+            zIndex: 1,
+          }}
+          animate={{
+            scale: [1, 1.15, 1],
+            opacity: [0.45, 0.75, 0.45],
+            x: [0, 30, 0],
+            y: [0, -25, 0],
+          }}
+          transition={{
+            duration: 13,
+            repeat: Number.POSITIVE_INFINITY,
+            repeatType: "mirror",
+            ease: "easeInOut",
+            delay: 3,
+          }}
+          aria-hidden="true"
+        />
+        {/* Orb 4 — small gold, bottom-center */}
+        <motion.div
+          className="absolute rounded-full blur-3xl pointer-events-none"
+          style={{
+            width: 180,
+            height: 180,
+            bottom: "-30px",
+            left: "38%",
+            background: "oklch(0.82 0.20 80 / 0.14)",
+            zIndex: 1,
+          }}
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.6, 1, 0.6],
+            x: [0, -15, 15, 0],
+            y: [0, -20, 0],
+          }}
+          transition={{
+            duration: 7,
+            repeat: Number.POSITIVE_INFINITY,
+            repeatType: "mirror",
+            ease: "easeInOut",
+            delay: 0.5,
+          }}
+          aria-hidden="true"
+        />
+        {/* Orb 5 — warm amber, bottom-right */}
+        <motion.div
+          className="absolute rounded-full blur-3xl pointer-events-none"
+          style={{
+            width: 400,
+            height: 400,
+            bottom: "-120px",
+            right: "-60px",
+            background: "oklch(0.70 0.17 75 / 0.09)",
+            zIndex: 1,
+          }}
+          animate={{
+            scale: [1, 1.12, 1],
+            opacity: [0.4, 0.7, 0.4],
+            x: [0, 20, -10, 0],
+            y: [0, -30, 0],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Number.POSITIVE_INFINITY,
+            repeatType: "mirror",
+            ease: "easeInOut",
+            delay: 4,
+          }}
+          aria-hidden="true"
+        />
+
+        {/* ── HERO BACKGROUND IMAGE + OVERLAYS ── */}
+        <div className="absolute inset-0" style={{ zIndex: 0 }}>
           <img
             src="/assets/generated/dental-clinic-hero.dim_1200x600.jpg"
             alt=""
             className="w-full h-full object-cover"
-            style={{ filter: "brightness(0.25) saturate(0.7)" }}
+            style={{ filter: "brightness(0.22) saturate(0.65)" }}
           />
+          {/* Deep 3-stop gradient overlay for more cinematic depth */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(135deg, oklch(0.06 0.02 60 / 0.85) 0%, oklch(0.08 0.04 85 / 0.75) 100%)",
+                "linear-gradient(180deg, oklch(0.05 0.015 60 / 0.92) 0%, oklch(0.09 0.04 80 / 0.68) 50%, oklch(0.05 0.015 60 / 0.92) 100%)",
+            }}
+          />
+          {/* Radial warm highlight in center */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 85% 55% at 50% 35%, oklch(0.18 0.06 80 / 0.38) 0%, transparent 68%)",
             }}
           />
         </div>
+
+        {/* ── CANVAS PARTICLES ── */}
+        <HeroParticles />
+
+        {/* ── SHIMMER SCAN LINE ── */}
+        <motion.div
+          className="absolute left-0 right-0 pointer-events-none"
+          style={{
+            height: 2,
+            background:
+              "linear-gradient(90deg, transparent 0%, oklch(0.88 0.18 85 / 0.55) 50%, transparent 100%)",
+            zIndex: 3,
+            filter: "blur(0.5px)",
+          }}
+          animate={{ y: ["-100%", "120vh"] }}
+          transition={{
+            duration: 4,
+            repeat: Number.POSITIVE_INFINITY,
+            repeatDelay: 2.5,
+            ease: "linear",
+          }}
+          aria-hidden="true"
+        />
+
+        {/* ── IRON MAN HUD OVERLAY ── */}
+        <IronManHUD />
+
+        {/* ── NEON BLUE ORB - center ── */}
+        <motion.div
+          className="absolute rounded-full blur-3xl pointer-events-none"
+          style={{
+            width: 350,
+            height: 350,
+            top: "20%",
+            left: "30%",
+            background: "oklch(0.82 0.16 205 / 0.06)",
+            zIndex: 1,
+          }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{
+            duration: 8,
+            repeat: Number.POSITIVE_INFINITY,
+            repeatType: "mirror",
+            ease: "easeInOut",
+            delay: 2,
+          }}
+          aria-hidden="true"
+        />
+        {/* ── ELECTRIC PURPLE ORB - top right ── */}
+        <motion.div
+          className="absolute rounded-full blur-3xl pointer-events-none"
+          style={{
+            width: 280,
+            height: 280,
+            top: "5%",
+            right: "15%",
+            background: "oklch(0.62 0.2 280 / 0.07)",
+            zIndex: 1,
+          }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.35, 0.65, 0.35] }}
+          transition={{
+            duration: 10,
+            repeat: Number.POSITIVE_INFINITY,
+            repeatType: "mirror",
+            ease: "easeInOut",
+            delay: 1,
+          }}
+          aria-hidden="true"
+        />
 
         <div className="relative z-10 flex flex-col items-center text-center px-6 pt-20 pb-24 md:pt-28 md:pb-32 max-w-5xl mx-auto">
           <motion.div
@@ -520,7 +1455,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.7 }}
-              className="font-display text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.08] mb-6"
+              className="font-display text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight mb-6"
             >
               AI Dental Scan in 30 Seconds
               <br />
@@ -548,11 +1483,15 @@ export default function HomePage() {
             >
               <motion.button
                 type="button"
-                whileHover={{ scale: 1.04 }}
+                whileHover={{
+                  scale: 1.04,
+                  boxShadow:
+                    "0 0 30px oklch(0.82 0.16 205 / 0.5), 0 0 60px oklch(0.82 0.16 205 / 0.2)",
+                }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleStartScan}
                 data-ocid="home.primary_button"
-                className="flex items-center justify-center gap-2 px-10 py-5 rounded-full font-semibold text-lg transition-all"
+                className="flex items-center justify-center gap-2 px-10 py-5 rounded-full font-semibold text-lg transition-all shimmer-button"
                 style={{
                   background:
                     "linear-gradient(135deg, oklch(0.82 0.18 85), oklch(0.68 0.16 80))",
@@ -643,6 +1582,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Section divider */}
+      <div className="relative h-px overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent blur-sm" />
+      </div>
       {/* ── CREDIBILITY BAR ── */}
       <div
         className="py-4 px-6"
@@ -675,6 +1619,99 @@ export default function HomePage() {
       </div>
 
       <main className="flex-1 flex flex-col items-center">
+        {/* ── NEURAL NETWORK AI SECTION ── */}
+        <motion.section
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="w-full max-w-6xl px-6 py-16"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            {/* Left: Neural network canvas */}
+            <div
+              className="relative rounded-3xl overflow-hidden"
+              style={{
+                height: 300,
+                background: "oklch(0.08 0.04 220 / 0.7)",
+                border: "1px solid oklch(0.82 0.16 205 / 0.25)",
+                boxShadow: "0 0 60px oklch(0.82 0.16 205 / 0.1)",
+              }}
+            >
+              <NeuralNetworkAnimation />
+              <div className="absolute top-4 left-4 flex items-center gap-2">
+                <div
+                  className="w-2 h-2 rounded-full animate-pulse"
+                  style={{ background: "oklch(0.82 0.16 205)" }}
+                />
+                <span
+                  className="text-xs font-mono"
+                  style={{ color: "oklch(0.75 0.12 205)" }}
+                >
+                  NEURAL NET ACTIVE
+                </span>
+              </div>
+              <div className="absolute bottom-4 right-4 text-right">
+                <span
+                  className="text-xs font-mono"
+                  style={{ color: "oklch(0.55 0.08 205)" }}
+                >
+                  28 NODES • 94% ACCURACY
+                </span>
+              </div>
+            </div>
+            {/* Right: AI explanation */}
+            <div className="flex flex-col gap-6">
+              <div>
+                <p
+                  className="text-xs font-bold uppercase tracking-[0.25em] mb-3"
+                  style={{ color: "oklch(0.82 0.16 205)" }}
+                >
+                  AI Architecture
+                </p>
+                <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">
+                  <span className="text-gradient-gold">Neural Network</span>{" "}
+                  <span className="text-gradient-neon">
+                    Built for Dentistry
+                  </span>
+                </h2>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Our AI processes each tooth individually through a multi-layer
+                  neural network trained on 50,000+ dental images, identifying
+                  patterns invisible to the human eye.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: "Model Type", value: "CNN Ensemble", color: "205" },
+                  { label: "Training Images", value: "50K+", color: "205" },
+                  { label: "Detection Accuracy", value: "94%", color: "280" },
+                  { label: "Inference Time", value: "<2 sec", color: "280" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-2xl p-4"
+                    style={{
+                      background: `oklch(0.10 0.04 ${item.color} / 0.5)`,
+                      border: `1px solid oklch(0.65 0.16 ${item.color} / 0.3)`,
+                    }}
+                  >
+                    <p
+                      className="font-display text-2xl font-bold"
+                      style={{ color: `oklch(0.82 0.16 ${item.color})` }}
+                    >
+                      {item.value}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {item.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.section>
+
         {/* ── STATS ROW ── */}
         <motion.section
           variants={sectionVariants}
@@ -690,13 +1727,17 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                whileHover={{ scale: 1.04 }}
+                whileHover={{
+                  scale: 1.04,
+                  rotateX: 3,
+                  rotateY: -3,
+                  transition: { duration: 0.2 },
+                }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="rounded-2xl p-6 text-center cursor-default"
+                className="rounded-2xl p-6 text-center cursor-default card-glow-border"
                 style={{
                   background: "oklch(0.12 0.04 85 / 0.7)",
-                  border: "1px solid oklch(0.72 0.15 85 / 0.3)",
-                  boxShadow: "0 0 24px oklch(0.72 0.15 85 / 0.06)",
+                  transformPerspective: 800,
                 }}
               >
                 <p className="font-display text-5xl md:text-6xl font-bold text-gradient-gold">
@@ -1289,6 +2330,32 @@ export default function HomePage() {
           </div>
         </motion.section>
 
+        {/* ── LIVE DEMO SECTION ── */}
+        <motion.section
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          className="w-full max-w-5xl px-6 py-16"
+        >
+          <div className="text-center mb-10">
+            <p
+              className="text-xs font-bold uppercase tracking-[0.25em] mb-3"
+              style={{ color: "oklch(0.82 0.16 205)" }}
+            >
+              Try It Instantly
+            </p>
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
+              <span className="text-gradient-neon">Live Demo</span>
+            </h2>
+            <p className="text-muted-foreground max-w-lg mx-auto text-sm">
+              Drop any dental photo below and see our AI analyze it in real-time
+              — no sign-in required for the preview.
+            </p>
+          </div>
+          <LiveDemoSection />
+        </motion.section>
+
         {/* ── DENTAL PASSPORT SECTION ── */}
         <motion.section
           variants={sectionVariants}
@@ -1453,11 +2520,12 @@ export default function HomePage() {
 
         {/* ── HOW IT WORKS ── */}
         <motion.section
+          ref={howItWorksReveal.ref}
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
-          className="w-full max-w-5xl px-6 py-16"
+          className={`w-full max-w-5xl px-6 py-16 ${howItWorksReveal.className}`}
         >
           <div className="text-center mb-12">
             <p
@@ -1517,13 +2585,20 @@ export default function HomePage() {
           </div>
         </motion.section>
 
+        {/* Section divider */}
+        <div className="relative h-px w-full max-w-5xl px-6 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent blur-sm" />
+        </div>
+
         {/* ── BOOK A DENTIST SECTION ── */}
         <motion.section
+          ref={dentistSectionReveal.ref}
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
-          className="w-full max-w-5xl px-6 py-16"
+          className={`w-full max-w-5xl px-6 py-16 ${dentistSectionReveal.className}`}
         >
           <div className="text-center mb-14">
             <p
@@ -1693,11 +2768,12 @@ export default function HomePage() {
 
         {/* ── FOUNDER / ABOUT SECTION ── */}
         <motion.section
+          ref={aboutReveal.ref}
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
-          className="w-full max-w-5xl px-6 py-16"
+          className={`w-full max-w-5xl px-6 py-16 ${aboutReveal.className}`}
         >
           <div className="text-center mb-12">
             <p
@@ -1764,11 +2840,12 @@ export default function HomePage() {
 
         {/* ── TESTIMONIALS ── */}
         <motion.section
+          ref={testimonialsReveal.ref}
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
-          className="w-full max-w-5xl px-6 py-16"
+          className={`w-full max-w-5xl px-6 py-16 ${testimonialsReveal.className}`}
           data-ocid="testimonials.section"
         >
           <div className="text-center mb-12">
@@ -2236,6 +3313,12 @@ export default function HomePage() {
             )}
           </motion.div>
         </motion.section>
+
+        {/* Section divider */}
+        <div className="relative h-px w-full max-w-5xl px-6 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent blur-sm" />
+        </div>
 
         {/* ── BEFORE / AFTER ── */}
         <motion.section

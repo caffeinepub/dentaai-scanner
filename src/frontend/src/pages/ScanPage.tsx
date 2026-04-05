@@ -216,7 +216,7 @@ export default function ScanPage() {
             className="flex-1 h-1.5 rounded-full overflow-hidden bg-muted"
           >
             <div
-              className="h-full rounded-full bg-primary transition-all duration-500"
+              className="h-full rounded-full transition-all duration-500"
               style={{
                 width:
                   i < captures.length
@@ -224,6 +224,14 @@ export default function ScanPage() {
                     : i === currentStep
                       ? "50%"
                       : "0%",
+                background:
+                  i <= currentStep
+                    ? "linear-gradient(90deg, oklch(0.72 0.16 80), oklch(0.88 0.18 85))"
+                    : undefined,
+                boxShadow:
+                  i < captures.length
+                    ? "0 0 8px oklch(0.78 0.16 80 / 0.5)"
+                    : undefined,
               }}
             />
           </div>
@@ -275,7 +283,11 @@ export default function ScanPage() {
           </motion.div>
         </AnimatePresence>
 
-        <div className="relative rounded-3xl overflow-hidden bg-black flex-1 min-h-[300px] max-h-[400px]">
+        {/* Camera frame with enhanced scan UI */}
+        <div
+          className="relative rounded-3xl overflow-hidden bg-black flex-1 min-h-[300px] max-h-[400px] animate-scan-pulse"
+          style={{ border: "2px solid oklch(0.78 0.16 80 / 0.6)" }}
+        >
           {isSupported === false ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-3 p-6">
               <div className="circle-icon w-16 h-16 bg-muted/30">
@@ -319,12 +331,27 @@ export default function ScanPage() {
 
               {isActive && (
                 <>
+                  {/* Double-line scan with gold glow */}
                   <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div
-                      className="absolute left-0 right-0 h-0.5 opacity-70 animate-scan-line"
+                      className="absolute left-0 right-0 opacity-80 animate-scan-line"
                       style={{
+                        height: "2px",
                         background:
-                          "linear-gradient(90deg, transparent, oklch(0.78 0.16 80), transparent)",
+                          "linear-gradient(90deg, transparent, oklch(0.88 0.18 85), transparent)",
+                        boxShadow:
+                          "0 0 12px 3px oklch(0.88 0.18 85 / 0.8), 0 0 24px 6px oklch(0.78 0.16 80 / 0.4)",
+                      }}
+                    />
+                    {/* Second parallel line */}
+                    <div
+                      className="absolute left-0 right-0 opacity-40 animate-scan-line"
+                      style={{
+                        height: "1px",
+                        marginTop: "4px",
+                        background:
+                          "linear-gradient(90deg, transparent, oklch(0.88 0.18 85 / 0.6), transparent)",
+                        animationDelay: "0.1s",
                       }}
                     />
                   </div>
@@ -336,7 +363,7 @@ export default function ScanPage() {
                         height: "60%",
                         border: "2px solid oklch(0.78 0.16 80 / 0.75)",
                         boxShadow:
-                          "0 0 0 9999px oklch(0 0 0 / 0.45), inset 0 0 20px oklch(0.78 0.16 80 / 0.05)",
+                          "0 0 0 9999px oklch(0 0 0 / 0.45), inset 0 0 20px oklch(0.78 0.16 80 / 0.08), 0 0 20px oklch(0.78 0.16 80 / 0.3)",
                       }}
                     />
                   </div>
@@ -349,10 +376,11 @@ export default function ScanPage() {
                   ].map((pos) => (
                     <div
                       key={pos}
-                      className={`absolute ${pos} w-5 h-5 pointer-events-none`}
+                      className={`absolute ${pos} w-6 h-6 pointer-events-none`}
                       style={{
-                        borderColor: "oklch(0.78 0.16 80)",
-                        borderWidth: "2px",
+                        borderColor: "oklch(0.88 0.18 85)",
+                        borderWidth: "2.5px",
+                        boxShadow: "0 0 8px oklch(0.88 0.18 85 / 0.6)",
                         borderStyle:
                           pos.includes("top") && pos.includes("left")
                             ? "solid none none solid"
@@ -422,7 +450,7 @@ export default function ScanPage() {
           {!allCaptured ? (
             <Button
               size="lg"
-              className="w-full text-base py-6 rounded-full font-semibold"
+              className="w-full text-base py-6 rounded-full font-semibold shimmer-button"
               onClick={handleCapture}
               disabled={!isActive || isLoading || isCapturing}
               data-ocid="scan.capture_button"
@@ -433,7 +461,7 @@ export default function ScanPage() {
           ) : (
             <Button
               size="lg"
-              className="w-full text-base py-6 rounded-full font-semibold glow-primary"
+              className="w-full text-base py-6 rounded-full font-semibold glow-primary shimmer-button"
               onClick={handleAnalyze}
               data-ocid="scan.primary_button"
             >

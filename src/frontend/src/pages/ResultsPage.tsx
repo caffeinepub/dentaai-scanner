@@ -50,12 +50,20 @@ const STATUS_CONFIG = {
 function IssueCard({ tooth, index }: { tooth: ToothRecord; index: number }) {
   const config = STATUS_CONFIG[tooth.status] ?? STATUS_CONFIG.risk;
   const Icon = config.icon;
+  const isCavity = tooth.status === "cavity";
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.07, duration: 0.4 }}
-      className={`glass-card rounded-3xl p-4 border ${config.border}`}
+      className={`glass-card rounded-3xl p-4 border ${
+        isCavity ? "bg-red-500/15 border-red-500/70" : config.border
+      }`}
+      style={
+        isCavity
+          ? { boxShadow: "0 0 18px 4px oklch(0.63 0.26 27 / 0.35)" }
+          : undefined
+      }
     >
       <div className="flex items-start gap-3">
         <div

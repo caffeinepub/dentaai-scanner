@@ -11,8 +11,10 @@ import FindDentistPage from "@/pages/FindDentistPage";
 import HistoryPage from "@/pages/HistoryPage";
 import HomePage from "@/pages/HomePage";
 import IssuePassportPage from "@/pages/IssuePassportPage";
+import MarketingDashboardPage from "@/pages/MarketingDashboardPage";
 import MessagesPage from "@/pages/MessagesPage";
 import MyBookingsPage from "@/pages/MyBookingsPage";
+import OperationsDashboardPage from "@/pages/OperationsDashboardPage";
 import PassportLookupPage from "@/pages/PassportLookupPage";
 import PassportPage from "@/pages/PassportPage";
 import PrivacyPage from "@/pages/PrivacyPage";
@@ -20,6 +22,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import QRCodePage from "@/pages/QRCodePage";
 import ResultsPage from "@/pages/ResultsPage";
 import ScanPage from "@/pages/ScanPage";
+import SupportDashboardPage from "@/pages/SupportDashboardPage";
 import TermsPage from "@/pages/TermsPage";
 import UITestPage from "@/pages/UITestPage";
 import YStatementPage from "@/pages/YStatementPage";
@@ -198,6 +201,24 @@ const pitchRoute = createRoute({
   component: YStatementPage,
 });
 
+const marketingDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/marketing-dashboard",
+  component: MarketingDashboardPage,
+});
+
+const operationsDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/operations-dashboard",
+  component: OperationsDashboardPage,
+});
+
+const supportDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/support-dashboard",
+  component: SupportDashboardPage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   scanRoute,
@@ -220,6 +241,9 @@ const routeTree = rootRoute.addChildren([
   demoRoute,
   uiTestRoute,
   pitchRoute,
+  marketingDashboardRoute,
+  operationsDashboardRoute,
+  supportDashboardRoute,
 ]);
 
 const router = createRouter({ routeTree });

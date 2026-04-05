@@ -66,6 +66,30 @@ function getToothSize(idx: number): [number, number, number] {
   return [w, h, d];
 }
 
+/** Glowing platform ring beneath the arch */
+function PlatformRing() {
+  const meshRef = useRef<THREE.Mesh>(null!);
+  useFrame((state) => {
+    if (meshRef.current) {
+      const mat = meshRef.current.material as THREE.MeshStandardMaterial;
+      mat.emissiveIntensity =
+        0.3 + Math.sin(state.clock.elapsedTime * 1.5) * 0.15;
+    }
+  });
+  return (
+    <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.1, 0]}>
+      <ringGeometry args={[2.8, 3.4, 64]} />
+      <meshStandardMaterial
+        color="#1a0800"
+        emissive="#c8860a"
+        emissiveIntensity={0.3}
+        transparent
+        opacity={0.7}
+      />
+    </mesh>
+  );
+}
+
 interface ToothMeshProps {
   tooth: ToothRecord;
   index: number;
@@ -138,7 +162,7 @@ function ToothMesh({
         ref={meshRef}
         args={[w, h, d]}
         radius={0.05}
-        smoothness={6}
+        smoothness={12}
         position={position}
         rotation={[0, rotationY, 0]}
         onClick={(e) => {
@@ -155,8 +179,8 @@ function ToothMesh({
           color="#f5f0e8"
           emissive={isActive ? glowColor : statusEmissive}
           emissiveIntensity={isActive ? 0.35 : 0.06}
-          roughness={0.15}
-          metalness={0.05}
+          roughness={0.08}
+          metalness={0.12}
           envMapIntensity={1.2}
         />
       </RoundedBox>
@@ -301,10 +325,10 @@ function JawBase({ isUpper }: { isUpper: boolean }) {
           >
             <boxGeometry args={[0.34, 0.22, 0.28]} />
             <meshStandardMaterial
-              color="#7b2d2d"
-              roughness={0.75}
+              color="#c96b7a"
+              roughness={0.8}
               metalness={0.0}
-              emissive="#3a0d0d"
+              emissive="#4a1020"
               emissiveIntensity={0.15}
             />
           </mesh>
@@ -324,23 +348,40 @@ export default function DentalArch3D({ teeth }: DentalArch3DProps) {
 
   return (
     <div
-      className="relative w-full rounded-2xl overflow-hidden"
+      className="relative w-full rounded-2xl overflow-hidden canvas-glow-ring"
       style={{ height: "480px" }}
       data-ocid="results.canvas_target"
     >
       <Canvas
         camera={{ position: [0, 2.8, 6.5], fov: 42 }}
         gl={{ antialias: true, alpha: false }}
-        style={{ background: "#0a0800" }}
+        shadows
+        style={{ background: "#060504" }}
       >
+        {/* Fog for depth */}
+        <fog attach="fog" args={["#060504", 12, 22]} />
+
         {/* Ambient base */}
         <ambientLight intensity={0.3} />
+
+        {/* Hemisphere light for natural ambient */}
+        <hemisphereLight args={["#ffe8c0", "#1a0a20", 0.4]} />
 
         {/* Warm key light (gold) */}
         <directionalLight
           position={[4, 8, 5]}
           intensity={1.6}
           color="#ffe8a0"
+          castShadow
+        />
+
+        {/* Spot from above — premium enamel reveal */}
+        <spotLight
+          position={[0, 8, 2]}
+          intensity={2.0}
+          color="#ffe4a0"
+          angle={0.6}
+          penumbra={0.7}
           castShadow
         />
 
@@ -360,6 +401,9 @@ export default function DentalArch3D({ teeth }: DentalArch3DProps) {
 
         {/* Warm under-glow */}
         <pointLight position={[0, -3, 2]} intensity={0.4} color="#a07000" />
+
+        {/* Glowing platform ring */}
+        <PlatformRing />
 
         {/* Jaw gum bases */}
         <JawBase isUpper />

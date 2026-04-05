@@ -53,6 +53,14 @@
   --sidebar-accent-foreground: 0.85 0.01 80;
   --sidebar-border: 0.22 0.015 60;
   --sidebar-ring: 0.78 0.16 80;
+
+  /* ── NEON BLUE + ELECTRIC PURPLE (Tony Stark Level) ── */
+  /* Neon Blue: #00D1FF → oklch(0.82 0.16 205) */
+  --neon-blue: 0.82 0.16 205;
+  /* Electric Purple: #7B61FF → oklch(0.62 0.2 280) */
+  --electric-purple: 0.62 0.2 280;
+  /* Deep space background for hero */
+  --deep-space: 0.05 0.015 240;
 }
 
 * {
@@ -100,17 +108,62 @@ body {
     background-clip: text;
   }
 
-  /* Upgraded glass card: richer border depth + inner top highlight */
-  .glass-card {
-    background: oklch(0.12 0.008 60 / 0.85);
-    backdrop-filter: blur(12px);
-    border: 1px solid oklch(0.3 0.03 70 / 0.6);
-    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.04);
+  /* Neon blue gradient text */
+  .text-gradient-neon {
+    background: linear-gradient(
+      135deg,
+      oklch(0.88 0.18 205),
+      oklch(0.68 0.2 255)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
+  /* Electric purple gradient text */
+  .text-gradient-purple {
+    background: linear-gradient(
+      135deg,
+      oklch(0.72 0.22 280),
+      oklch(0.62 0.2 305)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* HUD glow effect for Iron Man elements */
+  .hud-glow {
+    box-shadow: 0 0 20px oklch(0.82 0.16 205 / 0.6), 0 0 60px
+      oklch(0.82 0.16 205 / 0.2);
+  }
+
+  /* Neon border */
+  .neon-border {
+    border: 1px solid oklch(0.82 0.16 205 / 0.5);
+    box-shadow: 0 0 12px oklch(0.82 0.16 205 / 0.3), inset 0 0 12px
+      oklch(0.82 0.16 205 / 0.05);
+  }
+
+  /* Purple border glow */
+  .purple-border {
+    border: 1px solid oklch(0.62 0.2 280 / 0.5);
+    box-shadow: 0 0 12px oklch(0.62 0.2 280 / 0.3);
+  }
+
+  /* Upgraded glass card: stronger blur and glow */
+  .glass-card {
+    background: oklch(0.12 0.008 60 / 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid oklch(0.35 0.04 75 / 0.55);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.06), 0 8px 32px oklch(0 0 0 / 0.4);
+  }
+
+  /* Stronger glow-primary */
   .glow-primary {
-    box-shadow: 0 0 20px oklch(0.78 0.16 80 / 0.4), 0 0 60px
-      oklch(0.78 0.16 80 / 0.18);
+    box-shadow: 0 0 30px oklch(0.78 0.16 80 / 0.5), 0 0 80px
+      oklch(0.78 0.16 80 / 0.22), 0 0 160px oklch(0.78 0.16 80 / 0.08);
   }
 
   .glow-text {
@@ -145,9 +198,6 @@ body {
       oklch(0.78 0.16 80 / 0.15);
   }
 
-  /**
-   * Logo circle — gold border, no square edges.
-   */
   .logo-circle {
     border-radius: 9999px;
     display: flex;
@@ -159,7 +209,112 @@ body {
     box-shadow: 0 0 0 4px oklch(0.78 0.16 80 / 0.08), 0 0 20px 4px
       oklch(0.78 0.16 80 / 0.2), inset 0 0 12px oklch(0.78 0.16 80 / 0.06);
   }
+
+  /* ── PREMIUM UTILITIES ── */
+
+  .shimmer-button {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-button::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background: linear-gradient(
+      90deg,
+      transparent,
+      oklch(1 0 0 / 0.18),
+      transparent
+    );
+    animation: shimmer-sweep 2.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .glow-orb {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+    background: oklch(0.78 0.16 80 / 0.18);
+    animation: orb-drift 8s ease-in-out infinite;
+  }
+
+  .canvas-glow-ring {
+    box-shadow: 0 0 0 1px oklch(0.78 0.16 80 / 0.25), 0 0 40px 8px
+      oklch(0.78 0.16 80 / 0.12), inset 0 0 30px oklch(0.78 0.16 80 / 0.04);
+  }
+
+  .hero-bg-radial {
+    background: radial-gradient(
+      ellipse 90% 60% at 50% 30%,
+      oklch(0.18 0.04 80 / 0.35) 0%,
+      transparent 70%
+    );
+  }
+
+  .hero-grid-mesh {
+    background-image: repeating-linear-gradient(
+        0deg,
+        oklch(0.72 0.15 85 / 0.04) 0px,
+        oklch(0.72 0.15 85 / 0.04) 1px,
+        transparent 1px,
+        transparent 60px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        oklch(0.72 0.15 85 / 0.04) 0px,
+        oklch(0.72 0.15 85 / 0.04) 1px,
+        transparent 1px,
+        transparent 60px
+      );
+    animation: gridDrift 20s linear infinite;
+  }
+
+  .card-glow-border {
+    border: 1px solid oklch(0.78 0.16 80 / 0.35);
+    box-shadow: 0 0 20px 0 oklch(0.78 0.16 80 / 0.08), inset 0 1px 0
+      oklch(1 0 0 / 0.06);
+  }
+
+  .animate-section-reveal {
+    animation: section-reveal 0.7s ease-out both;
+  }
+
+  .animate-shimmer-sweep {
+    animation: shimmer-sweep 2.2s ease-in-out infinite;
+  }
+
+  .animate-orb-drift {
+    animation: orb-drift 8s ease-in-out infinite;
+  }
+
+  .animate-particle-rise {
+    animation: particle-rise 3s ease-out forwards;
+  }
+
+  .animate-ring-pulse {
+    animation: ring-pulse 2s ease-in-out infinite;
+  }
+
+  .animate-scan-pulse {
+    animation: scan-pulse 1.5s ease-in-out infinite;
+  }
+
+  /* ── IRON MAN / HUD ANIMATIONS ── */
+
+  /* Neural network node pulse */
+  .animate-node-pulse {
+    animation: node-pulse 2s infinite;
+  }
+
+  /* HUD flicker for Iron Man text */
+  .animate-hud-flicker {
+    animation: hud-flicker 4s infinite;
+  }
 }
+
+/* ── KEYFRAMES ── */
 
 @keyframes scan-line {
   0% {
@@ -205,6 +360,173 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(300%) skewX(-12deg);
+  }
+}
+
+@keyframes gridDrift {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 60px 60px;
+  }
+}
+
+@keyframes orb-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.12;
+  }
+  33% {
+    transform: translate(30px, -40px) scale(1.1);
+    opacity: 0.18;
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.92);
+    opacity: 0.1;
+  }
+}
+
+@keyframes particle-rise {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-120px) translateX(var(--px, 20px)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes arc-draw {
+  from {
+    stroke-dashoffset: 440;
+  }
+  to {
+    stroke-dashoffset: var(--arc-end, 100);
+  }
+}
+
+@keyframes ring-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0px oklch(0.78 0.16 80 / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px oklch(0.78 0.16 80 / 0.08);
+  }
+}
+
+@keyframes section-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scan-pulse {
+  0%,
+  100% {
+    opacity: 0.9;
+    box-shadow: 0 0 8px 2px oklch(0.88 0.18 85 / 0.5);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 20px 4px oklch(0.88 0.18 85 / 0.9);
+  }
+}
+
+/* Iron Man / Neural Net keyframes */
+@keyframes node-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes hud-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hud-rotate-reverse {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes iron-scan {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes data-stream {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes hud-flicker {
+  0%,
+  95%,
+  100% {
+    opacity: 1;
+  }
+  96% {
+    opacity: 0.4;
+  }
+  97% {
+    opacity: 1;
+  }
+  98% {
+    opacity: 0.2;
+  }
+  99% {
+    opacity: 1;
   }
 }
 

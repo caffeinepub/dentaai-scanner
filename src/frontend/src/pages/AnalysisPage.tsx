@@ -16,12 +16,25 @@ const STEPS = [
   { label: "Generating 3D model...", duration: 1200 },
 ];
 
+// Gold particle positions for burst animation
+const PARTICLES = [
+  { px: "20px", delay: "0s" },
+  { px: "-30px", delay: "0.15s" },
+  { px: "45px", delay: "0.3s" },
+  { px: "-15px", delay: "0.1s" },
+  { px: "35px", delay: "0.45s" },
+  { px: "-45px", delay: "0.2s" },
+  { px: "10px", delay: "0.35s" },
+  { px: "-25px", delay: "0.05s" },
+];
+
 export default function AnalysisPage() {
   const navigate = useNavigate();
   const { capturedImages, setScanResult } = useScanContext();
   const { identity, login, clear } = useInternetIdentity();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [showParticles, setShowParticles] = useState(false);
 
   const imageCount = capturedImages.length;
 
@@ -35,6 +48,9 @@ export default function AnalysisPage() {
       timers.push(
         setTimeout(() => {
           setCurrentStep(i);
+          // Trigger particle burst on each step start
+          setShowParticles(false);
+          setTimeout(() => setShowParticles(true), 50);
         }, startDelay),
       );
 
@@ -100,6 +116,7 @@ export default function AnalysisPage() {
           </Button>
         )}
       </header>
+
       <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
         <div
           className="absolute inset-0 pointer-events-none"
@@ -109,6 +126,32 @@ export default function AnalysisPage() {
           }}
         />
         <div className="absolute inset-0 grid-bg opacity-40 pointer-events-none" />
+
+        {/* Gold particle burst */}
+        <AnimatePresence>
+          {showParticles && (
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
+              {PARTICLES.map((p, i) => (
+                <motion.div
+                  key={`particle-${i}-${currentStep}`}
+                  initial={{ opacity: 0.7, y: 0, scale: 1 }}
+                  animate={{ opacity: 0, y: -120, scale: 0.3 }}
+                  transition={{
+                    duration: 2.5,
+                    delay: Number.parseFloat(p.delay),
+                    ease: "easeOut",
+                  }}
+                  className="absolute w-2 h-2 rounded-full"
+                  style={{
+                    background: "oklch(0.88 0.18 85)",
+                    boxShadow: "0 0 8px oklch(0.88 0.18 85 / 0.8)",
+                    translateX: p.px,
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </AnimatePresence>
 
         <div className="relative z-10 flex flex-col items-center gap-10 px-6 max-w-md w-full">
           {/* Circular spinner with logo inside */}
@@ -122,6 +165,11 @@ export default function AnalysisPage() {
                 borderRightColor: "oklch(0.78 0.16 80 / 0.5)",
                 animation: "spin 1.2s linear infinite",
               }}
+            />
+            {/* Pulse ring around spinner */}
+            <div
+              className="absolute inset-[-10px] rounded-full animate-ring-pulse pointer-events-none"
+              style={{ border: "1px solid oklch(0.78 0.16 80 / 0.3)" }}
             />
             <LogoCircle size="lg" animate />
             <div className="absolute inset-4 overflow-hidden rounded-full">
@@ -202,12 +250,16 @@ export default function AnalysisPage() {
             })}
           </div>
 
+          {/* Progress bar with glow */}
           <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full bg-primary"
+              className="h-full rounded-full"
               style={{
                 width: `${progressPct}%`,
                 transition: "width 0.5s ease",
+                background:
+                  "linear-gradient(90deg, oklch(0.72 0.16 80), oklch(0.88 0.18 85))",
+                boxShadow: "0 0 12px oklch(0.78 0.16 80 / 0.6)",
               }}
             />
           </div>
