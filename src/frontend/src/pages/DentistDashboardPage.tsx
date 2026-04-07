@@ -42,7 +42,7 @@ function statusColor(status: string) {
     return "bg-green-500/15 text-green-400 border-green-500/30";
   if (s === "declined") return "bg-red-500/15 text-red-400 border-red-500/30";
   if (s === "completed")
-    return "bg-blue-500/15 text-blue-400 border-blue-500/30";
+    return "bg-yellow-500/15 text-yellow-400 border-yellow-500/30";
   return "bg-yellow-500/15 text-yellow-400 border-yellow-500/30";
 }
 
@@ -580,7 +580,7 @@ export default function DentistDashboardPage() {
                           {statusStr === "confirmed" && (
                             <Button
                               size="sm"
-                              className="rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 text-xs px-3"
+                              className="rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30 text-xs px-3"
                               onClick={() => completeBooking(bk.bookingId)}
                               data-ocid="dentist_dashboard.save_button"
                             >

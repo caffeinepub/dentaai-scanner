@@ -326,7 +326,7 @@ export default function UITestPage() {
                   { label: "Healthy", color: "bg-green-400" },
                   { label: "Risk", color: "bg-yellow-400" },
                   { label: "Cavity", color: "bg-red-400" },
-                  { label: "Loading", color: "bg-blue-400" },
+                  { label: "Loading", color: "bg-yellow-400" },
                   { label: "Inactive", color: "bg-muted-foreground" },
                 ].map(({ label, color }) => (
                   <div key={label} className="flex items-center gap-1.5">

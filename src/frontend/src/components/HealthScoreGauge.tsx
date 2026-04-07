@@ -69,7 +69,7 @@ export default function HealthScoreGauge({ score }: Props) {
             cy="90"
             r={radius}
             fill="none"
-            stroke="oklch(0.22 0.03 252)"
+            stroke="oklch(0.22 0.03 75)"
             strokeWidth={strokeWidth}
           />
           {/* Progress arc */}

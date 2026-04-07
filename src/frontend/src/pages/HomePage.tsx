@@ -712,10 +712,10 @@ function LiveDemoSection() {
               ? "oklch(0.12 0.08 205 / 0.7)"
               : "oklch(0.09 0.04 220 / 0.7)",
             border: isDragging
-              ? "2px dashed oklch(0.82 0.16 205 / 0.8)"
-              : "2px dashed oklch(0.82 0.16 205 / 0.3)",
+              ? "2px dashed oklch(0.88 0.18 85 / 0.8)"
+              : "2px dashed oklch(0.88 0.18 85 / 0.3)",
             boxShadow: isDragging
-              ? "0 0 40px oklch(0.82 0.16 205 / 0.3)"
+              ? "0 0 40px oklch(0.88 0.18 85 / 0.3)"
               : "none",
           }}
           data-ocid="live_demo.dropzone"
@@ -736,7 +736,7 @@ function LiveDemoSection() {
                     className="absolute left-0 right-0 h-0.5"
                     style={{
                       background:
-                        "linear-gradient(90deg, transparent, oklch(0.82 0.16 205), transparent)",
+                        "linear-gradient(90deg, transparent, oklch(0.88 0.18 85), transparent)",
                     }}
                     animate={{ y: [0, 280] }}
                     transition={{
@@ -749,7 +749,7 @@ function LiveDemoSection() {
                     <div className="w-12 h-12 rounded-full border-2 border-[oklch(0.82_0.16_205)] border-t-transparent animate-spin" />
                     <span
                       className="text-sm font-mono animate-hud-flicker"
-                      style={{ color: "oklch(0.82 0.16 205)" }}
+                      style={{ color: "oklch(0.88 0.18 85)" }}
                     >
                       AI ANALYZING...
                     </span>
@@ -760,7 +760,7 @@ function LiveDemoSection() {
                           className="w-1.5 rounded-full"
                           style={{
                             height: 16,
-                            background: "oklch(0.82 0.16 205)",
+                            background: "oklch(0.88 0.18 85)",
                           }}
                           animate={{ scaleY: [0.3, 1, 0.3] }}
                           transition={{
@@ -783,8 +783,8 @@ function LiveDemoSection() {
                 className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold z-20"
                 style={{
                   background: "oklch(0.15 0.05 220 / 0.9)",
-                  border: "1px solid oklch(0.82 0.16 205 / 0.4)",
-                  color: "oklch(0.82 0.16 205)",
+                  border: "1px solid oklch(0.88 0.18 85 / 0.4)",
+                  color: "oklch(0.88 0.18 85)",
                 }}
                 data-ocid="live_demo.close_button"
               >
@@ -798,8 +798,8 @@ function LiveDemoSection() {
                 transition={{ duration: 0.2 }}
                 className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
                 style={{
-                  background: "oklch(0.82 0.16 205 / 0.12)",
-                  border: "1px solid oklch(0.82 0.16 205 / 0.3)",
+                  background: "oklch(0.88 0.18 85 / 0.12)",
+                  border: "1px solid oklch(0.88 0.18 85 / 0.3)",
                 }}
               >
                 📷
@@ -807,7 +807,7 @@ function LiveDemoSection() {
               <div className="text-center">
                 <p
                   className="font-semibold text-sm"
-                  style={{ color: "oklch(0.82 0.16 205)" }}
+                  style={{ color: "oklch(0.88 0.18 85)" }}
                 >
                   {isDragging
                     ? "Drop to analyze →"
@@ -835,7 +835,7 @@ function LiveDemoSection() {
         className="rounded-3xl p-6 min-h-[280px] flex flex-col"
         style={{
           background: "oklch(0.09 0.04 220 / 0.7)",
-          border: "1px solid oklch(0.82 0.16 205 / 0.2)",
+          border: "1px solid oklch(0.88 0.18 85 / 0.2)",
         }}
       >
         {!showResult && !isAnalyzing && (
@@ -844,10 +844,10 @@ function LiveDemoSection() {
               className="w-12 h-12 rounded-full flex items-center justify-center"
               style={{
                 background: "oklch(0.12 0.05 205 / 0.5)",
-                border: "1px solid oklch(0.82 0.16 205 / 0.25)",
+                border: "1px solid oklch(0.88 0.18 85 / 0.25)",
               }}
             >
-              <span style={{ color: "oklch(0.72 0.12 205)" }}>🦷</span>
+              <span style={{ color: "oklch(0.82 0.16 82)" }}>🦷</span>
             </div>
             <p className="text-sm text-muted-foreground">
               AI analysis results will appear here
@@ -877,7 +877,7 @@ function LiveDemoSection() {
                 />
                 <span
                   className="text-sm font-mono"
-                  style={{ color: "oklch(0.72 0.12 205)" }}
+                  style={{ color: "oklch(0.82 0.16 82)" }}
                 >
                   {step}
                 </span>
@@ -895,7 +895,7 @@ function LiveDemoSection() {
             <div className="flex items-center justify-between">
               <p
                 className="text-xs font-bold uppercase tracking-[0.2em]"
-                style={{ color: "oklch(0.82 0.16 205)" }}
+                style={{ color: "oklch(0.88 0.18 85)" }}
               >
                 Analysis Complete
               </p>
@@ -1396,7 +1396,7 @@ export default function HomePage() {
             height: 350,
             top: "20%",
             left: "30%",
-            background: "oklch(0.82 0.16 205 / 0.06)",
+            background: "oklch(0.88 0.18 85 / 0.06)",
             zIndex: 1,
           }}
           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
@@ -1417,7 +1417,7 @@ export default function HomePage() {
             height: 280,
             top: "5%",
             right: "15%",
-            background: "oklch(0.62 0.2 280 / 0.07)",
+            background: "oklch(0.75 0.19 75 / 0.07)",
             zIndex: 1,
           }}
           animate={{ scale: [1, 1.15, 1], opacity: [0.35, 0.65, 0.35] }}
@@ -1486,7 +1486,7 @@ export default function HomePage() {
                 whileHover={{
                   scale: 1.04,
                   boxShadow:
-                    "0 0 30px oklch(0.82 0.16 205 / 0.5), 0 0 60px oklch(0.82 0.16 205 / 0.2)",
+                    "0 0 30px oklch(0.88 0.18 85 / 0.5), 0 0 60px oklch(0.88 0.18 85 / 0.2)",
                 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleStartScan}
@@ -1634,19 +1634,19 @@ export default function HomePage() {
               style={{
                 height: 300,
                 background: "oklch(0.08 0.04 220 / 0.7)",
-                border: "1px solid oklch(0.82 0.16 205 / 0.25)",
-                boxShadow: "0 0 60px oklch(0.82 0.16 205 / 0.1)",
+                border: "1px solid oklch(0.88 0.18 85 / 0.25)",
+                boxShadow: "0 0 60px oklch(0.88 0.18 85 / 0.1)",
               }}
             >
               <NeuralNetworkAnimation />
               <div className="absolute top-4 left-4 flex items-center gap-2">
                 <div
                   className="w-2 h-2 rounded-full animate-pulse"
-                  style={{ background: "oklch(0.82 0.16 205)" }}
+                  style={{ background: "oklch(0.88 0.18 85)" }}
                 />
                 <span
                   className="text-xs font-mono"
-                  style={{ color: "oklch(0.75 0.12 205)" }}
+                  style={{ color: "oklch(0.82 0.16 82)" }}
                 >
                   NEURAL NET ACTIVE
                 </span>
@@ -1654,7 +1654,7 @@ export default function HomePage() {
               <div className="absolute bottom-4 right-4 text-right">
                 <span
                   className="text-xs font-mono"
-                  style={{ color: "oklch(0.55 0.08 205)" }}
+                  style={{ color: "oklch(0.65 0.12 78)" }}
                 >
                   28 NODES • 94% ACCURACY
                 </span>
@@ -1665,7 +1665,7 @@ export default function HomePage() {
               <div>
                 <p
                   className="text-xs font-bold uppercase tracking-[0.25em] mb-3"
-                  style={{ color: "oklch(0.82 0.16 205)" }}
+                  style={{ color: "oklch(0.88 0.18 85)" }}
                 >
                   AI Architecture
                 </p>
@@ -2341,7 +2341,7 @@ export default function HomePage() {
           <div className="text-center mb-10">
             <p
               className="text-xs font-bold uppercase tracking-[0.25em] mb-3"
-              style={{ color: "oklch(0.82 0.16 205)" }}
+              style={{ color: "oklch(0.88 0.18 85)" }}
             >
               Try It Instantly
             </p>

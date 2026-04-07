@@ -51,14 +51,14 @@ export default function MarketingDashboardPage() {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ background: "oklch(0.07 0.015 220)" }}
+      style={{ background: "oklch(0.07 0.015 80)" }}
     >
       {/* Header */}
       <header
         className="sticky top-0 z-50 px-6 py-4 flex items-center gap-4"
         style={{
           background: "oklch(0.08 0.02 220 / 0.95)",
-          borderBottom: "1px solid oklch(0.82 0.16 205 / 0.2)",
+          borderBottom: "1px solid oklch(0.88 0.18 85 / 0.2)",
           backdropFilter: "blur(16px)",
         }}
       >
@@ -67,7 +67,7 @@ export default function MarketingDashboardPage() {
             variant="ghost"
             size="sm"
             className="rounded-full"
-            style={{ color: "oklch(0.82 0.16 205)" }}
+            style={{ color: "oklch(0.88 0.18 85)" }}
             data-ocid="marketing_dashboard.link"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
@@ -79,23 +79,23 @@ export default function MarketingDashboardPage() {
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{
-                background: "oklch(0.82 0.16 205 / 0.15)",
-                border: "1px solid oklch(0.82 0.16 205 / 0.4)",
+                background: "oklch(0.88 0.18 85 / 0.15)",
+                border: "1px solid oklch(0.88 0.18 85 / 0.4)",
               }}
             >
               <BarChart2
                 className="w-5 h-5"
-                style={{ color: "oklch(0.82 0.16 205)" }}
+                style={{ color: "oklch(0.88 0.18 85)" }}
               />
             </div>
             <div>
               <h1
                 className="font-display font-bold text-lg"
-                style={{ color: "oklch(0.82 0.16 205)" }}
+                style={{ color: "oklch(0.88 0.18 85)" }}
               >
                 Marketing Dashboard
               </h1>
-              <p className="text-xs" style={{ color: "oklch(0.55 0.08 205)" }}>
+              <p className="text-xs" style={{ color: "oklch(0.65 0.12 78)" }}>
                 Analyze traffic and content engagement
               </p>
             </div>
@@ -104,9 +104,9 @@ export default function MarketingDashboardPage() {
         <div
           className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono"
           style={{
-            background: "oklch(0.82 0.16 205 / 0.1)",
-            border: "1px solid oklch(0.82 0.16 205 / 0.3)",
-            color: "oklch(0.75 0.12 205)",
+            background: "oklch(0.88 0.18 85 / 0.1)",
+            border: "1px solid oklch(0.88 0.18 85 / 0.3)",
+            color: "oklch(0.82 0.16 82)",
           }}
         >
           <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -188,7 +188,7 @@ export default function MarketingDashboardPage() {
               </p>
               <p
                 className="text-xs mt-1"
-                style={{ color: "oklch(0.55 0.05 220)" }}
+                style={{ color: "oklch(0.65 0.10 78)" }}
               >
                 {stat.label}
               </p>
@@ -207,18 +207,18 @@ export default function MarketingDashboardPage() {
             className="rounded-2xl p-6"
             style={{
               background: "oklch(0.09 0.04 220 / 0.8)",
-              border: "1px solid oklch(0.82 0.16 205 / 0.2)",
+              border: "1px solid oklch(0.88 0.18 85 / 0.2)",
             }}
           >
             <p
               className="font-display font-bold mb-1"
-              style={{ color: "oklch(0.82 0.16 205)" }}
+              style={{ color: "oklch(0.88 0.18 85)" }}
             >
               7-Day Traffic
             </p>
             <p
               className="text-xs mb-5"
-              style={{ color: "oklch(0.55 0.06 205)" }}
+              style={{ color: "oklch(0.65 0.12 78)" }}
             >
               Daily unique visitors
             </p>
@@ -240,13 +240,13 @@ export default function MarketingDashboardPage() {
                     style={{
                       height: `${d.pct}%`,
                       background:
-                        "linear-gradient(180deg, oklch(0.82 0.16 205), oklch(0.55 0.14 220))",
+                        "linear-gradient(180deg, oklch(0.88 0.18 85), oklch(0.65 0.17 72))",
                       opacity: 0.8,
                     }}
                   />
                   <span
                     className="text-xs"
-                    style={{ color: "oklch(0.50 0.05 220)" }}
+                    style={{ color: "oklch(0.60 0.10 75)" }}
                   >
                     {d.day}
                   </span>
@@ -264,18 +264,18 @@ export default function MarketingDashboardPage() {
             className="rounded-2xl p-6"
             style={{
               background: "oklch(0.09 0.04 220 / 0.8)",
-              border: "1px solid oklch(0.82 0.16 205 / 0.2)",
+              border: "1px solid oklch(0.88 0.18 85 / 0.2)",
             }}
           >
             <p
               className="font-display font-bold mb-1"
-              style={{ color: "oklch(0.82 0.16 205)" }}
+              style={{ color: "oklch(0.88 0.18 85)" }}
             >
               Top CTAs
             </p>
             <p
               className="text-xs mb-5"
-              style={{ color: "oklch(0.55 0.06 205)" }}
+              style={{ color: "oklch(0.65 0.12 78)" }}
             >
               Click-through by button
             </p>
@@ -283,16 +283,16 @@ export default function MarketingDashboardPage() {
               {CTA_DATA.map((c) => (
                 <div key={c.label}>
                   <div className="flex justify-between text-xs mb-1">
-                    <span style={{ color: "oklch(0.75 0.08 220)" }}>
+                    <span style={{ color: "oklch(0.82 0.14 80)" }}>
                       {c.label}
                     </span>
-                    <span style={{ color: "oklch(0.82 0.16 205)" }}>
+                    <span style={{ color: "oklch(0.88 0.18 85)" }}>
                       {c.pct}%
                     </span>
                   </div>
                   <div
                     className="h-1.5 rounded-full overflow-hidden"
-                    style={{ background: "oklch(0.15 0.04 220)" }}
+                    style={{ background: "oklch(0.15 0.04 80)" }}
                   >
                     <motion.div
                       initial={{ scaleX: 0 }}
@@ -302,7 +302,7 @@ export default function MarketingDashboardPage() {
                       style={{
                         width: `${c.pct}%`,
                         background:
-                          "linear-gradient(90deg, oklch(0.82 0.16 205), oklch(0.62 0.2 255))",
+                          "linear-gradient(90deg, oklch(0.88 0.18 85), oklch(0.72 0.19 78))",
                       }}
                     />
                   </div>
@@ -322,12 +322,12 @@ export default function MarketingDashboardPage() {
             className="lg:col-span-2 rounded-2xl p-6"
             style={{
               background: "oklch(0.09 0.04 220 / 0.8)",
-              border: "1px solid oklch(0.82 0.16 205 / 0.2)",
+              border: "1px solid oklch(0.88 0.18 85 / 0.2)",
             }}
           >
             <p
               className="font-display font-bold mb-5"
-              style={{ color: "oklch(0.82 0.16 205)" }}
+              style={{ color: "oklch(0.88 0.18 85)" }}
             >
               Top Content Pages
             </p>
@@ -336,14 +336,14 @@ export default function MarketingDashboardPage() {
                 <thead>
                   <tr
                     style={{
-                      borderBottom: "1px solid oklch(0.82 0.16 205 / 0.15)",
+                      borderBottom: "1px solid oklch(0.88 0.18 85 / 0.15)",
                     }}
                   >
                     {["Page", "Views", "Bounce", "Avg Time"].map((h) => (
                       <th
                         key={h}
                         className="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wide"
-                        style={{ color: "oklch(0.55 0.06 220)" }}
+                        style={{ color: "oklch(0.65 0.12 78)" }}
                       >
                         {h}
                       </th>
@@ -355,19 +355,19 @@ export default function MarketingDashboardPage() {
                     <tr
                       key={row.page}
                       style={{
-                        borderBottom: "1px solid oklch(0.82 0.16 205 / 0.08)",
+                        borderBottom: "1px solid oklch(0.88 0.18 85 / 0.08)",
                       }}
                       data-ocid={`marketing_dashboard.row.item.${i + 1}`}
                     >
                       <td
                         className="py-3 px-3 font-mono text-xs"
-                        style={{ color: "oklch(0.82 0.16 205)" }}
+                        style={{ color: "oklch(0.88 0.18 85)" }}
                       >
                         {row.page}
                       </td>
                       <td
                         className="py-3 px-3 text-xs"
-                        style={{ color: "oklch(0.80 0.06 220)" }}
+                        style={{ color: "oklch(0.85 0.14 82)" }}
                       >
                         {row.views}
                       </td>
@@ -399,18 +399,18 @@ export default function MarketingDashboardPage() {
             className="rounded-2xl p-6"
             style={{
               background: "oklch(0.09 0.04 220 / 0.8)",
-              border: "1px solid oklch(0.82 0.16 205 / 0.2)",
+              border: "1px solid oklch(0.88 0.18 85 / 0.2)",
             }}
           >
             <p
               className="font-display font-bold mb-1"
-              style={{ color: "oklch(0.82 0.16 205)" }}
+              style={{ color: "oklch(0.88 0.18 85)" }}
             >
               Traffic Sources
             </p>
             <p
               className="text-xs mb-5"
-              style={{ color: "oklch(0.55 0.06 205)" }}
+              style={{ color: "oklch(0.65 0.12 78)" }}
             >
               Signup origin breakdown
             </p>
@@ -418,16 +418,16 @@ export default function MarketingDashboardPage() {
               {SOURCES.map((s, i) => (
                 <div key={s.label}>
                   <div className="flex justify-between text-xs mb-1.5">
-                    <span style={{ color: "oklch(0.75 0.08 220)" }}>
+                    <span style={{ color: "oklch(0.82 0.14 80)" }}>
                       {s.label}
                     </span>
-                    <span style={{ color: "oklch(0.82 0.16 205)" }}>
+                    <span style={{ color: "oklch(0.88 0.18 85)" }}>
                       {s.pct}%
                     </span>
                   </div>
                   <div
                     className="h-2 rounded-full overflow-hidden"
-                    style={{ background: "oklch(0.15 0.04 220)" }}
+                    style={{ background: "oklch(0.15 0.04 80)" }}
                   >
                     <motion.div
                       initial={{ scaleX: 0 }}
@@ -441,7 +441,7 @@ export default function MarketingDashboardPage() {
                       style={{
                         width: `${s.pct}%`,
                         background:
-                          "linear-gradient(90deg, oklch(0.82 0.16 205), oklch(0.62 0.2 255))",
+                          "linear-gradient(90deg, oklch(0.88 0.18 85), oklch(0.72 0.19 78))",
                       }}
                     />
                   </div>

@@ -87,14 +87,14 @@ export default function OperationsDashboardPage() {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ background: "oklch(0.07 0.015 280)" }}
+      style={{ background: "oklch(0.07 0.015 80)" }}
     >
       {/* Header */}
       <header
         className="sticky top-0 z-50 px-6 py-4 flex items-center gap-4"
         style={{
           background: "oklch(0.08 0.02 280 / 0.95)",
-          borderBottom: "1px solid oklch(0.62 0.2 280 / 0.25)",
+          borderBottom: "1px solid oklch(0.75 0.19 75 / 0.25)",
           backdropFilter: "blur(16px)",
         }}
       >
@@ -103,7 +103,7 @@ export default function OperationsDashboardPage() {
             variant="ghost"
             size="sm"
             className="rounded-full"
-            style={{ color: "oklch(0.72 0.2 280)" }}
+            style={{ color: "oklch(0.82 0.18 82)" }}
             data-ocid="operations_dashboard.link"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
@@ -115,23 +115,23 @@ export default function OperationsDashboardPage() {
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{
-                background: "oklch(0.62 0.2 280 / 0.15)",
-                border: "1px solid oklch(0.62 0.2 280 / 0.4)",
+                background: "oklch(0.75 0.19 75 / 0.15)",
+                border: "1px solid oklch(0.75 0.19 75 / 0.4)",
               }}
             >
               <Server
                 className="w-5 h-5"
-                style={{ color: "oklch(0.72 0.2 280)" }}
+                style={{ color: "oklch(0.82 0.18 82)" }}
               />
             </div>
             <div>
               <h1
                 className="font-display font-bold text-lg"
-                style={{ color: "oklch(0.72 0.2 280)" }}
+                style={{ color: "oklch(0.82 0.18 82)" }}
               >
                 Operations Dashboard
               </h1>
-              <p className="text-xs" style={{ color: "oklch(0.52 0.10 280)" }}>
+              <p className="text-xs" style={{ color: "oklch(0.65 0.14 78)" }}>
                 Monitor automations and workflows
               </p>
             </div>
@@ -140,9 +140,9 @@ export default function OperationsDashboardPage() {
         <div
           className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono"
           style={{
-            background: "oklch(0.62 0.2 280 / 0.1)",
-            border: "1px solid oklch(0.62 0.2 280 / 0.3)",
-            color: "oklch(0.65 0.16 280)",
+            background: "oklch(0.75 0.19 75 / 0.1)",
+            border: "1px solid oklch(0.75 0.19 75 / 0.3)",
+            color: "oklch(0.75 0.17 80)",
           }}
         >
           <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -208,7 +208,7 @@ export default function OperationsDashboardPage() {
                 />
                 <span
                   className="text-xs"
-                  style={{ color: "oklch(0.50 0.06 280)" }}
+                  style={{ color: "oklch(0.62 0.12 75)" }}
                 >
                   {stat.sub}
                 </span>
@@ -221,7 +221,7 @@ export default function OperationsDashboardPage() {
               </p>
               <p
                 className="text-xs mt-1"
-                style={{ color: "oklch(0.55 0.05 280)" }}
+                style={{ color: "oklch(0.65 0.12 78)" }}
               >
                 {stat.label}
               </p>
@@ -240,12 +240,12 @@ export default function OperationsDashboardPage() {
             className="rounded-2xl p-6"
             style={{
               background: "oklch(0.09 0.04 280 / 0.7)",
-              border: "1px solid oklch(0.62 0.2 280 / 0.2)",
+              border: "1px solid oklch(0.75 0.19 75 / 0.2)",
             }}
           >
             <p
               className="font-display font-bold mb-5"
-              style={{ color: "oklch(0.72 0.2 280)" }}
+              style={{ color: "oklch(0.82 0.18 82)" }}
             >
               System Health
             </p>
@@ -261,7 +261,7 @@ export default function OperationsDashboardPage() {
                 >
                   <span
                     className="text-sm"
-                    style={{ color: "oklch(0.75 0.06 280)" }}
+                    style={{ color: "oklch(0.82 0.14 80)" }}
                   >
                     {item.label}
                   </span>
@@ -301,12 +301,12 @@ export default function OperationsDashboardPage() {
             className="rounded-2xl p-6"
             style={{
               background: "oklch(0.09 0.04 280 / 0.7)",
-              border: "1px solid oklch(0.62 0.2 280 / 0.2)",
+              border: "1px solid oklch(0.75 0.19 75 / 0.2)",
             }}
           >
             <p
               className="font-display font-bold mb-5"
-              style={{ color: "oklch(0.72 0.2 280)" }}
+              style={{ color: "oklch(0.82 0.18 82)" }}
             >
               Recent Events
             </p>
@@ -321,14 +321,14 @@ export default function OperationsDashboardPage() {
                   style={{
                     borderBottom:
                       i < EVENTS.length - 1
-                        ? "1px solid oklch(0.62 0.2 280 / 0.1)"
+                        ? "1px solid oklch(0.75 0.19 75 / 0.1)"
                         : "none",
                   }}
                   data-ocid={`operations_dashboard.item.${i + 1}`}
                 >
                   <span
                     className="text-xs font-mono shrink-0"
-                    style={{ color: "oklch(0.50 0.06 280)" }}
+                    style={{ color: "oklch(0.62 0.12 75)" }}
                   >
                     {e.time}
                   </span>
@@ -340,7 +340,7 @@ export default function OperationsDashboardPage() {
                           ? "oklch(0.72 0.18 142)"
                           : e.type === "warn"
                             ? "oklch(0.82 0.18 75)"
-                            : "oklch(0.70 0.06 280)",
+                            : "oklch(0.78 0.14 80)",
                     }}
                   >
                     {e.msg}
@@ -360,12 +360,12 @@ export default function OperationsDashboardPage() {
           className="w-full rounded-2xl p-6"
           style={{
             background: "oklch(0.09 0.04 280 / 0.7)",
-            border: "1px solid oklch(0.62 0.2 280 / 0.2)",
+            border: "1px solid oklch(0.75 0.19 75 / 0.2)",
           }}
         >
           <p
             className="font-display font-bold mb-5"
-            style={{ color: "oklch(0.72 0.2 280)" }}
+            style={{ color: "oklch(0.82 0.18 82)" }}
           >
             Performance Bottlenecks
           </p>
@@ -382,7 +382,7 @@ export default function OperationsDashboardPage() {
                 <div className="flex justify-between">
                   <span
                     className="text-xs"
-                    style={{ color: "oklch(0.65 0.06 280)" }}
+                    style={{ color: "oklch(0.75 0.14 78)" }}
                   >
                     {b.label}
                   </span>
@@ -398,10 +398,7 @@ export default function OperationsDashboardPage() {
                     {b.value}
                   </span>
                 </div>
-                <p
-                  className="text-xs"
-                  style={{ color: "oklch(0.50 0.04 280)" }}
-                >
+                <p className="text-xs" style={{ color: "oklch(0.62 0.10 75)" }}>
                   {b.note}
                 </p>
               </div>

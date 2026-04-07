@@ -80,8 +80,8 @@ const COMMON_ISSUES = [
 
 const CAT_COLORS: Record<string, string> = {
   "Scan Error": "oklch(0.72 0.22 25)",
-  Login: "oklch(0.82 0.18 205)",
-  Passport: "oklch(0.72 0.2 280)",
+  Login: "oklch(0.88 0.18 85)",
+  Passport: "oklch(0.82 0.18 82)",
   Booking: "oklch(0.82 0.18 75)",
 };
 
